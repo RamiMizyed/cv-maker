@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CV Maker
+
+A web-based CV/Resume builder built with **Next.js**, **TypeScript**, and **Tailwind CSS**.  
+It provides a simple way to create, customize, and export a professional CV directly in the browser.
+
+---
+
+## Features
+
+- **Live Preview** – Update your CV in real time while editing.
+- **Multi-Language Support** – English, Turkish, and Arabic (with RTL support).
+- **Font Options** – Choose between Google Fonts and locally hosted fonts.
+- **Customizable Sections** – Manage personal info, experience, education, projects, and skills.
+- **PDF Export** – Generate a print-ready PDF version of your CV.
+- **Minimal UI** – Built with [shadcn/ui](https://ui.shadcn.com/) components for a clean design.
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone & Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/cvmaker.git
+cd cvmaker
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+npm run dev
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# or
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+yarn dev
+Open http://localhost:3000
+in your browser.
 
-## Learn More
+Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+Next.js 14+
+– App Router
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+TypeScript
+– Static typing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tailwind CSS
+– Styling
 
-## Deploy on Vercel
+shadcn/ui
+– UI components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+jsPDF
+– PDF export
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Project Structure
+src/
+├── app/ # Next.js app router
+├── components/ # Reusable UI components
+│ └── cv-maker/ # CV builder components
+├── lib/ # Helpers (fonts, translations, etc.)
+├── icons/ # Custom icons
+├── types/ # TypeScript types
+└── public/ # Static assets (images, fonts)
+
+Deployment
+
+This project is optimized for deployment on Vercel
+:
+
+vercel
+
+More details: Next.js Deployment Docs
+.
+
+License
+
+MIT ©
+
+---
