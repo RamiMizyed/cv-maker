@@ -75,7 +75,7 @@ export default function ExportDialog() {
 						<Label htmlFor="pageFormat">Page Format</Label>
 						<Select
 							value={pageFormat}
-							onValueChange={(v) => setPageFormat(v as any)}>
+							onValueChange={(v: "a4" | "letter") => setPageFormat(v)}>
 							<SelectTrigger className="w-full">
 								<SelectValue />
 							</SelectTrigger>
@@ -90,7 +90,9 @@ export default function ExportDialog() {
 						<Label htmlFor="orientation">Orientation</Label>
 						<Select
 							value={orientation}
-							onValueChange={(v) => setOrientation(v as any)}>
+							onValueChange={(v: "portrait" | "landscape") =>
+								setOrientation(v)
+							}>
 							<SelectTrigger className="w-full">
 								<SelectValue />
 							</SelectTrigger>
