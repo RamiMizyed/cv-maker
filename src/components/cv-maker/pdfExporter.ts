@@ -1,5 +1,5 @@
 // components/cv-maker/pdfExporter.ts
-import jsPDF from "jspdf";
+import jsPDF, { TextOptionsLight } from "jspdf";
 import { CVData } from "@/types/cv";
 import translations from "@/lib/translations"; // Adjust path as needed
 
@@ -76,7 +76,9 @@ export const exportToPDF = async ({
 		doc.setFont(jsPdfFont, "bold");
 		if (isRtl) doc.setFont("Amiri", "normal");
 		doc.setFontSize(12);
-		doc.text(title, margin, cursorY, { lang: isRtl ? "ar" : undefined } as any);
+		doc.text(title, margin, cursorY, {
+			lang: isRtl ? "ar" : undefined,
+		} as TextOptionsLight);
 		doc.setDrawColor(200);
 		doc.line(margin, cursorY + 4, contentWidth + margin, cursorY + 4);
 		cursorY += 25;
@@ -95,7 +97,7 @@ export const exportToPDF = async ({
 	doc.text(personalInfo.name, pageWidth / 2, cursorY, {
 		align: "center",
 		lang: isRtl ? "ar" : undefined,
-	} as any);
+	} as TextOptionsLight);
 	cursorY += doc.getTextDimensions(personalInfo.name).h + 6;
 
 	// ... continue for title, contact info, summary, experience, etc.
