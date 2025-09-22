@@ -25,33 +25,52 @@ const getDefaultFont = (lang: string) => {
 };
 
 // Initial State
+// Initial State
 const getInitialState = (lang: string): CVData => ({
 	personalInfo: {
-		name: "Your name",
-		title: "your title",
-		email: "youremail@email.com",
-		phone: "+1 (555) 123-4567",
-		website: "yourname.dev",
-		github: "github.com/yourgithub",
-		summary: "Innovative and detail-oriented Frontend Developer...",
-		portrait: "assets/Cat_01.png",
+		name: "Alex Johnson",
+		title: "Senior Frontend Developer",
+		email: "alex.johnson.dev@example.com",
+		phone: "+1 (555) 987-6543",
+		website: "alexjohnson.dev",
+		github: "github.com/alexjohnson",
+		summary:
+			"Creative and detail-oriented Senior Frontend Developer with 7+ years of experience building scalable web applications. Passionate about crafting clean user experiences, leading engineering teams, and driving accessibility and performance improvements.",
+		portrait: "/assets/Cat_01.png",
 	},
 	experience: [
 		{
 			id: 1,
-			company: "Innovatech Solutions",
+			company: "TechWave Solutions",
 			position: "Senior Frontend Developer",
-			startDate: "Jan 2020",
+			startDate: "Jan 2021",
 			endDate: "Present",
-			description: "• Led the development...",
+			description:
+				"• Led a team of 5 engineers in developing a design system adopted across 3 company products.\n" +
+				"• Architected and migrated a legacy React codebase to Next.js with TypeScript, reducing load times by 35%.\n" +
+				"• Collaborated with designers and product managers to deliver accessible, responsive interfaces used by 1M+ users.",
 		},
 		{
 			id: 2,
 			company: "Creative Minds Agency",
 			position: "Frontend Developer",
 			startDate: "Jun 2017",
-			endDate: "Dec 2019",
-			description: "• Developed and maintained...",
+			endDate: "Dec 2020",
+			description:
+				"• Developed marketing websites and e-commerce stores with custom CMS integrations.\n" +
+				"• Built reusable React components and animations that improved engagement and reduced bounce rates.\n" +
+				"• Worked directly with clients to translate business requirements into technical solutions.",
+		},
+		{
+			id: 3,
+			company: "Startup Hub",
+			position: "Junior Web Developer",
+			startDate: "Aug 2015",
+			endDate: "May 2017",
+			description:
+				"• Supported the development of early-stage SaaS products.\n" +
+				"• Wrote modular JavaScript, optimized CSS, and improved SEO performance.\n" +
+				"• Learned agile methodologies and collaborated in cross-functional teams.",
 		},
 	],
 	education: [
@@ -59,21 +78,41 @@ const getInitialState = (lang: string): CVData => ({
 			id: 1,
 			institution: "State University",
 			degree: "B.S. in Computer Science",
-			startDate: "Aug 2013",
-			endDate: "May 2017",
+			startDate: "Aug 2011",
+			endDate: "May 2015",
 		},
 	],
 	projects: [
 		{
 			id: 1,
-			name: "E-commerce Platform",
-			description: "• Developed a full-stack e-commerce site...",
-			link: "github.com/yourusername/ecommerce",
-			technologies: "Next.js, TypeScript, PostgreSQL",
+			name: "GreenTrack – Sustainability Dashboard",
+			description:
+				"• Developed an interactive dashboard visualizing environmental data with charts and 3D models.\n" +
+				"• Integrated APIs for live CO₂ tracking and renewable energy stats.",
+			link: "github.com/alexjohnson/greentrack",
+			technologies: "React, Next.js, D3.js, TailwindCSS",
+		},
+		{
+			id: 2,
+			name: "DevConnect – Networking Platform",
+			description:
+				"• Created a platform for developers to showcase portfolios, post blogs, and connect with peers.\n" +
+				"• Implemented authentication, profile customization, and a real-time chat feature.",
+			link: "github.com/alexjohnson/devconnect",
+			technologies: "Next.js, TypeScript, Firebase, Chakra UI",
+		},
+		{
+			id: 3,
+			name: "E-commerce Storefront",
+			description:
+				"• Designed and developed a modern, responsive e-commerce storefront with secure checkout.\n" +
+				"• Implemented product filtering, reviews, and Stripe integration.",
+			link: "github.com/alexjohnson/ecommerce",
+			technologies: "React, Node.js, Express, PostgreSQL, Stripe API",
 		},
 	],
 	skills:
-		"React, Next.js, TypeScript, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, GraphQL, Node.js, Git",
+		"JavaScript (ES6+), TypeScript, React, Next.js, HTML5, CSS3, TailwindCSS, Redux, GraphQL, Node.js, Express, PostgreSQL, Git, Docker, Jest, Cypress, Accessibility (WCAG), Agile/Scrum",
 	selectedFont: getDefaultFont(lang),
 });
 

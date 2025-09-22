@@ -17,6 +17,7 @@ import { TabId } from "@/types/cv";
 import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
 import ExportDialog from "./ExportDialog";
+import { Card } from "@/components/ui/card";
 
 const TABS: {
 	id: TabId;
@@ -53,12 +54,11 @@ export default function Editor() {
 	};
 
 	return (
-		<div className="col-span-1 h-full overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 editor-scroll">
-			<div className="flex justify-between items-center mb-6">
-				<h1 className="text-2xl font-bold">CV Editor</h1>
-				<ExportDialog />
+		<Card className="col-span-1 lg:col-span-2 h-full overflow-y-auto  ">
+			<div className="flex flex-col  justify-between items-center ">
+				<h1 className="text-2xl font-bold"> Editor</h1>
 			</div>
-			<div className="flex space-x-2 border-b mb-6">
+			<div className="flex flex-wrap space-x-2 border-b mb-6">
 				{TABS.map((tab) => (
 					<Button
 						key={tab.id}
@@ -71,6 +71,7 @@ export default function Editor() {
 				))}
 			</div>
 			<div className="space-y-6">{renderTabContent()}</div>
-		</div>
+			<ExportDialog />
+		</Card>
 	);
 }

@@ -55,16 +55,17 @@ export default function PersonalInfoForm() {
 
 	return (
 		<Card>
-			<CardContent className="pt-6 space-y-4">
+			<CardContent className=" space-y-4">
 				<div>
 					<Label className="mb-2" htmlFor="font-selector">
 						Font
 					</Label>
 					<Select
 						value={selectedFont}
-						onValueChange={(value) =>
-							dispatch({ type: "SET_FONT", payload: value })
-						}>
+						onValueChange={(value) => {
+							dispatch({ type: "SET_FONT", payload: value });
+							console.log("Font changed to:", value);
+						}}>
 						<SelectTrigger id="font-selector">
 							<SelectValue placeholder="Select a font" />
 						</SelectTrigger>

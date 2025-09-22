@@ -11,19 +11,8 @@ import GlobeIcon from "@/icons/GlobeIcon";
 import { GithubIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-const CVPreview = forwardRef<HTMLDivElement>((props, ref) => {
-	const handlePreviewScroll = (e: React.WheelEvent<HTMLDivElement>) => {
-		const element = e.currentTarget;
-		const { deltaY } = e;
-		const { scrollTop, scrollHeight, clientHeight } = element;
-		if (deltaY > 0 && scrollTop + clientHeight >= scrollHeight - 1) {
-			return;
-		}
-		if (deltaY < 0 && scrollTop === 0) {
-			return;
-		}
-		e.stopPropagation();
-	};
+// ---------------- CV PREVIEW ----------------
+const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
 	const { state } = useCV();
 	const {
 		personalInfo,
@@ -33,35 +22,17 @@ const CVPreview = forwardRef<HTMLDivElement>((props, ref) => {
 		skills,
 		selectedFont,
 	} = state;
+
 	const { lang } = useLang();
 	const t = translations[lang];
-
 	const isRtl = lang === "ar";
-	const previewContainerRef = useRef<HTMLDivElement>(null);
-	const cvPreviewRef = useRef<HTMLElement>(null);
 
 	return (
 		<div className="relative lg:col-span-3 w-full ">
-			<Card
-				onWheel={handlePreviewScroll}
-				ref={previewContainerRef}
-				className="shadow-lg overflow-scroll min-h-[99vh]  flex justify-center px-2 lg:px-6">
+			<Card className="shadow-lg overflow-scroll min-h-[99vh]  flex justify-center ">
 				<article
-					ref={cvPreviewRef}
 					style={{ fontFamily: selectedFont }}
-					className=" w-full rounded-md
-max-w-full
-h-full
-min-h-[297mm]
-bg-white
-text-black
-p-4
-sm:p-8
-lg:w-[210mm]
-lg:p-[20mm]
-text-sm
-transition-transform
-duration-300">
+					className="w-full max-w-full h-full min-h-[297mm] rounded-md bg-white text-black p-4 sm:p-8 lg:p-[20mm] text-sm transition-transform duration-300">
 					<header className="text-center mb-8 border-b border-slate-200 pb-6 flex flex-col items-center">
 						{personalInfo.portrait && (
 							<img
@@ -238,34 +209,7 @@ duration-300">
 });
 CVPreview.displayName = "CVPreview";
 
+// ---------------- WRAPPER ----------------
 export default function Preview() {
-	const previewContainerRef = useRef<HTMLDivElement>(null);
-	const cvPreviewRef = useRef<HTMLDivElement>(null);
-
-	// This stops the main page from scrolling when you scroll the preview pane
-	const handlePreviewScroll = (e: React.WheelEvent<HTMLDivElement>) => {
-		const element = e.currentTarget;
-		const { deltaY } = e;
-		if (
-			deltaY > 0 &&
-			element.scrollTop + element.clientHeight >= element.scrollHeight - 1
-		) {
-			return;
-		}
-		if (deltaY < 0 && element.scrollTop === 0) {
-			return;
-		}
-		e.stopPropagation();
-	};
-
-	return (
-		<div
-			ref={previewContainerRef}
-			className="col-span-1 h-full overflow-y-auto bg-gray-200 dark:bg-gray-800 p-8 preview-scroll"
-			onWheel={handlePreviewScroll}>
-			<div className="w-full max-w-[210mm] mx-auto">
-				<CVPreview ref={cvPreviewRef} />
-			</div>
-		</div>
-	);
+	return <CVPreview />;
 }

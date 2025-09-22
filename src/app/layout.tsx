@@ -4,6 +4,7 @@ import "./globals.css";
 import { LangProvider } from "@/lib/lang";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { ThemeProvider } from "next-themes";
+import NavBar from "@/components/ui/navBar";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<LangProvider>
 						<SmoothScroll>
+							<NavBar />
 							<main className="min-h-screen">{children}</main>
 						</SmoothScroll>
 					</LangProvider>

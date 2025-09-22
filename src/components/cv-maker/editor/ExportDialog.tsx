@@ -48,7 +48,7 @@ export default function ExportDialog() {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button>
+				<Button className="w-full">
 					<PrinterIcon className="h-4 w-4 mr-2" /> Export to PDF
 				</Button>
 			</DialogTrigger>
@@ -56,11 +56,13 @@ export default function ExportDialog() {
 				<DialogHeader>
 					<DialogTitle>Export Options</DialogTitle>
 				</DialogHeader>
-				<div className="space-y-4 py-4">
-					<div>
+
+				<div className="flex flex-col space-y-4 py-4">
+					<div className="w-full">
 						<Label htmlFor="filename">Filename</Label>
 						<Input
 							id="filename"
+							className="w-full"
 							value={filename}
 							onChange={(e) => setFilename(e.target.value)}
 							placeholder={`${
@@ -68,35 +70,38 @@ export default function ExportDialog() {
 							}.pdf`}
 						/>
 					</div>
-					<div>
+
+					<div className="w-full">
 						<Label htmlFor="pageFormat">Page Format</Label>
 						<Select
 							value={pageFormat}
 							onValueChange={(v) => setPageFormat(v as any)}>
-							<SelectTrigger>
+							<SelectTrigger className="w-full">
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent className="w-full">
 								<SelectItem value="a4">A4</SelectItem>
 								<SelectItem value="letter">Letter</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
-					<div>
+
+					<div className="w-full">
 						<Label htmlFor="orientation">Orientation</Label>
 						<Select
 							value={orientation}
 							onValueChange={(v) => setOrientation(v as any)}>
-							<SelectTrigger>
+							<SelectTrigger className="w-full">
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent className="w-full">
 								<SelectItem value="portrait">Portrait</SelectItem>
 								<SelectItem value="landscape">Landscape</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
 				</div>
+
 				<Button onClick={handleExport} className="w-full">
 					Export
 				</Button>
