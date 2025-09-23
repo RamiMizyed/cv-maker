@@ -10,7 +10,9 @@ import Preview from "./preview/Preview";
 export default function CVMaker() {
 	return (
 		<CVProvider>
-			<div className="grid grid-cols-1 lg:grid-cols-5 gap-8 h-full container mx-auto py-10 lg:py-20 px-3 lg:px-6">
+			<div
+				id="cvMaker"
+				className="grid grid-cols-1 lg:grid-cols-5 gap-8 h-full container mx-auto py-10 lg:py-20 px-3 lg:px-6">
 				<Editor />
 				<Preview />
 			</div>

@@ -58,11 +58,11 @@ export default function Editor() {
 			<div className="flex flex-col  justify-between items-center ">
 				<h1 className="text-2xl font-bold"> Editor</h1>
 			</div>
-			<div className="flex flex-wrap space-x-2 border-b mb-6">
+			<div className="flex flex-wrap gap-2 space-x-2 border-b mb-6">
 				{TABS.map((tab) => (
 					<Button
 						key={tab.id}
-						variant={activeTab === tab.id ? "default" : "ghost"}
+						variant={activeTab === tab.id ? "default" : "outline"}
 						onClick={() => setActiveTab(tab.id)}
 						className="flex-1 justify-center">
 						<tab.icon className="h-4 w-4 mr-2" />

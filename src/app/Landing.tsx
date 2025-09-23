@@ -25,7 +25,7 @@ export default function LandingHero() {
 	};
 
 	return (
-		<div dir={isRtl ? "rtl" : "ltr"}>
+		<div className="" dir={isRtl ? "rtl" : "ltr"}>
 			{/* Replaced min-h-screen with vertical padding for a section feel */}
 			<div className="container mx-auto px-6 lg:px-8 py-24 sm:py-32">
 				<div className="grid items-center gap-12 lg:grid-cols-2">

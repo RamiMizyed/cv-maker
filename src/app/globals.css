@@ -119,4 +119,65 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+	@font-face {
+		font-family: "Roboto";
+		src: url("/fonts/Roboto-VariableFont_wdth,wght.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Open Sans";
+		src: url("/fonts/OpenSans-VariableFont_wdth,wght.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Lato";
+		src: url("/fonts/Lato-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Montserrat";
+		src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Oswald";
+		src: url("/fonts/Oswald-VariableFont_wght.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Source Sans 3";
+		src: url("/fonts/SourceSans3-VariableFont_wght.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Merriweather";
+		src: url("/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf")
+			format("truetype");
+	}
+	@font-face {
+		font-family: "PT Sans";
+		src: url("/fonts/PTSans-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Ubuntu";
+		src: url("/fonts/Ubuntu-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Amiri";
+		src: url("/fonts/Amiri-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Cairo";
+		src: url("/fonts/Cairo-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Almarai";
+		src: url("/fonts/Almarai-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Tajawal";
+		src: url("/fonts/Tajawal-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Lalezar";
+		src: url("/fonts/Lalezar-Regular.ttf") format("truetype");
+	}
+	@font-face {
+		font-family: "Scheherazade New";
+		src: url("/fonts/ScheherazadeNew-Regular.ttf") format("truetype");
+	}
 }

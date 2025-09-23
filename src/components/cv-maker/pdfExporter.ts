@@ -1,4 +1,3 @@
-// components/cv-maker/pdfExporter.ts
 import jsPDF, { TextOptionsLight } from "jspdf";
 import { CVData } from "@/types/cv";
 import translations from "@/lib/translations"; // Adjust path as needed
@@ -48,7 +47,6 @@ export const exportToPDF = async ({
 			doc.setFont("Amiri");
 		} catch (error) {
 			console.error("Failed to load Arabic font:", error);
-			alert("Could not load the Arabic font. PDF may not render correctly.");
 		}
 	}
 
@@ -84,13 +82,8 @@ export const exportToPDF = async ({
 		cursorY += 25;
 	};
 
-	// --- The rest of the PDF generation logic from your original component ---
-	// (This part is long, so I'll put a placeholder. Just copy-paste the logic here)
-	// For brevity, the full PDF rendering logic (header, summary, experience, etc.) from
-	// your original `handleExport` function should be pasted here.
-	// Make sure to replace state variables like `personalInfo` with `cvData.personalInfo`.
-	// Example for header:
 	// --- Header ---
+	checkPageBreak(50);
 	doc.setFont(jsPdfFont, "bold");
 	if (isRtl) doc.setFont("Amiri", "normal");
 	doc.setFontSize(22);
@@ -100,7 +93,159 @@ export const exportToPDF = async ({
 	} as TextOptionsLight);
 	cursorY += doc.getTextDimensions(personalInfo.name).h + 6;
 
-	// ... continue for title, contact info, summary, experience, etc.
+	// Title
+	doc.setFont(jsPdfFont, "normal");
+	if (isRtl) doc.setFont("Amiri", "normal");
+	doc.setFontSize(14);
+	doc.text(personalInfo.title, pageWidth / 2, cursorY, {
+		align: "center",
+		lang: isRtl ? "ar" : undefined,
+	} as TextOptionsLight);
+	cursorY += doc.getTextDimensions(personalInfo.title).h + 6;
+
+	// Contact Info
+	doc.setFont(jsPdfFont, "normal");
+	if (isRtl) doc.setFont("Amiri", "normal");
+	doc.setFontSize(10);
+	const contacts = [
+		personalInfo.phone,
+		personalInfo.email,
+		personalInfo.website,
+		personalInfo.github,
+	].filter(Boolean); // Filter out empty strings
+	const contactText = contacts.join(" | ");
+	doc.text(contactText, pageWidth / 2, cursorY, {
+		align: "center",
+		lang: isRtl ? "ar" : undefined,
+	} as TextOptionsLight);
+	cursorY += 30;
+
+	// --- Summary ---
+	if (personalInfo.summary) {
+		addSectionTitle(t.summary);
+		doc.setFont(jsPdfFont, "normal");
+		if (isRtl) doc.setFont("Amiri", "normal");
+		doc.setFontSize(10);
+		const splitSummary = doc.splitTextToSize(
+			personalInfo.summary,
+			contentWidth
+		);
+		doc.text(splitSummary, margin, cursorY, {
+			lang: isRtl ? "ar" : undefined,
+		} as TextOptionsLight);
+		cursorY += doc.getTextDimensions(splitSummary).h + 20;
+	}
+
+	// --- Experience ---
+	if (experience && experience.length > 0) {
+		addSectionTitle(t.experience);
+		experience.forEach((job) => {
+			checkPageBreak(50);
+			doc.setFont(jsPdfFont, "bold");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(11);
+			doc.text(job.position, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			// Fix for the TypeScript error: t.present might not exist on the type
+			const endDateText = job.endDate || (t as any).present || "Present";
+			doc.text(
+				`${job.startDate} - ${endDateText}`,
+				contentWidth + margin,
+				cursorY,
+				{ align: "right", lang: isRtl ? "ar" : undefined } as TextOptionsLight
+			);
+			cursorY += 12;
+
+			doc.setFont(jsPdfFont, "normal");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(10);
+			doc.text(`${job.company}`, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			cursorY += 15;
+
+			if (job.description) {
+				doc.setFont(jsPdfFont, "normal");
+				if (isRtl) doc.setFont("Amiri", "normal");
+				doc.setFontSize(10);
+				const splitDesc = doc.splitTextToSize(
+					`- ${job.description}`,
+					contentWidth
+				);
+				doc.text(splitDesc, margin, cursorY, {
+					lang: isRtl ? "ar" : undefined,
+				} as TextOptionsLight);
+				cursorY += doc.getTextDimensions(splitDesc).h + 10;
+			}
+		});
+	}
+
+	// --- Education ---
+	if (education && education.length > 0) {
+		addSectionTitle(t.education);
+		education.forEach((edu) => {
+			checkPageBreak(30);
+			doc.setFont(jsPdfFont, "bold");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(11);
+			doc.text(edu.degree, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			doc.text(
+				`${edu.startDate} - ${edu.endDate}`,
+				contentWidth + margin,
+				cursorY,
+				{ align: "right", lang: isRtl ? "ar" : undefined } as TextOptionsLight
+			);
+			cursorY += 12;
+
+			doc.setFont(jsPdfFont, "normal");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(10);
+			doc.text(`${edu.institution}`, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			cursorY += 15;
+		});
+	}
+
+	// --- Projects ---
+	if (projects && projects.length > 0) {
+		addSectionTitle(t.projects);
+		projects.forEach((proj) => {
+			checkPageBreak(40);
+			doc.setFont(jsPdfFont, "bold");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(11);
+			doc.text(proj.name, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			cursorY += 12;
+
+			doc.setFont(jsPdfFont, "normal");
+			if (isRtl) doc.setFont("Amiri", "normal");
+			doc.setFontSize(10);
+			const splitDesc = doc.splitTextToSize(proj.description, contentWidth);
+			doc.text(splitDesc, margin, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+			cursorY += doc.getTextDimensions(splitDesc).h + 15;
+		});
+	}
+
+	// --- Skills ---
+	if (skills) {
+		addSectionTitle(t.skills);
+		doc.setFont(jsPdfFont, "normal");
+		if (isRtl) doc.setFont("Amiri", "normal");
+		doc.setFontSize(10);
+		const splitSkills = doc.splitTextToSize(skills, contentWidth);
+		doc.text(splitSkills, margin, cursorY, {
+			lang: isRtl ? "ar" : undefined,
+		} as TextOptionsLight);
+		cursorY += doc.getTextDimensions(splitSkills).h + 10;
+	}
 
 	// --- Save File ---
 	const defaultFilename = `${
