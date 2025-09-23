@@ -148,7 +148,8 @@ export const exportToPDF = async ({
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
 			// Fix for the TypeScript error: t.present might not exist on the type
-			const endDateText = job.endDate || (t as { [key: string]: string }).present || "Present";
+			const endDateText =
+				job.endDate || (t as { [key: string]: string }).present || "Present";
 			doc.text(
 				`${job.startDate} - ${endDateText}`,
 				contentWidth + margin,
