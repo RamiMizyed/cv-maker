@@ -107,7 +107,50 @@ export default function PersonalInfoForm() {
 					</div>
 				</div>
 
-				{/* ... other fields: email, phone, website, github ... */}
+				{/* contact fields */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<Label htmlFor="email">{t.email}</Label>
+						<Input
+							id="email"
+							name="email"
+							type="email"
+							value={personalInfo.email}
+							onChange={handleChange}
+						/>
+					</div>
+					<div>
+						<Label htmlFor="phone">{t.phone}</Label>
+						<Input
+							id="phone"
+							name="phone"
+							type="tel"
+							value={personalInfo.phone}
+							onChange={handleChange}
+						/>
+					</div>
+				</div>
+
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<Label htmlFor="website">{t.website}</Label>
+						<Input
+							id="website"
+							name="website"
+							value={personalInfo.website}
+							onChange={handleChange}
+						/>
+					</div>
+					<div>
+						<Label htmlFor="github">{t.github}</Label>
+						<Input
+							id="github"
+							name="github"
+							value={personalInfo.github}
+							onChange={handleChange}
+						/>
+					</div>
+				</div>
 
 				<div>
 					<Label htmlFor="summary">{t.summary}</Label>
