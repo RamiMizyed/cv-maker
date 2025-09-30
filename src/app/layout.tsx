@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "CV Maker — Rami Mizyed",
+	title: "CV Maker - Client Side CV Builder",
 	description:
 		"Browser-side CV builder by Rami Mizyed. Create professional CVs with multilingual support (English, Arabic, Turkish).",
 	applicationName: "CV Maker",
