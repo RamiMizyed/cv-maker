@@ -21,7 +21,6 @@ const Loading = () => {
 			});
 
 			exitTl.to(loadingRef.current, {
-				delay: 2.5,
 				duration: 0.6,
 				y: "100%",
 				opacity: 0,

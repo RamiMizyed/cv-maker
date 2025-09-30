@@ -7,15 +7,23 @@ import { CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Poppins } from "next/font/google";
+import { motion, Variants } from "framer-motion";
+
 const poppins = Poppins({
 	subsets: ["latin"],
 	weight: ["600", "700"],
 	variable: "--font-poppins",
 });
+
 export default function LandingHero() {
 	const { lang } = useLang();
 	const t = translations[lang];
 	const isRtl = lang === "ar";
+	const features = [
+		{ title: t.feature1Title, desc: t.feature1Desc },
+		{ title: t.feature2Title, desc: t.feature2Desc },
+		{ title: t.feature3Title, desc: t.feature3Desc },
+	];
 
 	const handleScroll = () => {
 		const cvMakerElement = document.getElementById("cvMaker");
@@ -27,60 +35,89 @@ export default function LandingHero() {
 		}
 	};
 
+	// Variants for staggered animations
+	const containerVariants: Variants = {
+		hidden: { opacity: 0 },
+		show: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.2,
+				delay: 0.15,
+			},
+		},
+	};
+
+	const itemVariants: Variants = {
+		hidden: { opacity: 0, y: 20 },
+		show: {
+			opacity: 1,
+			y: 0,
+			transition: { duration: 0.6, ease: "easeOut", delay: 0.15 },
+		},
+	};
+
 	return (
-		<div className="" dir={isRtl ? "rtl" : "ltr"}>
-			{/* Replaced min-h-screen with vertical padding for a section feel */}
-			<div className="container mx-auto px-6 lg:px-8 py-24 sm:py-32">
+		<div className="pt-5 lg:pt-10" dir={isRtl ? "rtl" : "ltr"}>
+			<div className="container mx-auto  px-6 lg:px-8 py-24 sm:py-32">
 				<div className="grid items-center gap-12 lg:grid-cols-2">
-					{/* Left Column: Text Content & CTA */}
-					<div className="flex flex-col items-start ">
-						<h1
+					{/* Left Column */}
+					<motion.div
+						className="flex flex-col items-start"
+						variants={containerVariants}
+						initial="hidden"
+						animate="show">
+						<motion.h1
 							className={`${poppins.className} text-4xl sm:text-5xl max-w-2xl font-extrabold text-transparent bg-clip-text
 								bg-gradient-to-br
 								from-sky-700 via-indigo-600 to-pink-500
 								dark:from-pink-300 dark:via-indigo-100 dark:to-pink-200
-								drop-shadow-sm uppercase`}>
+								drop-shadow-sm uppercase`}
+							variants={itemVariants}>
 							{t.landingTitle}
-						</h1>
-						<p className="mt-6 max-w-xl text-lg ">{t.landingSubtitle}</p>
+						</motion.h1>
 
-						{/* Benefit-focused feature list */}
-						<ul className="mt-8 space-y-4 text-left">
-							<li className="flex items-center gap-3">
-								<CheckCircleIcon className="h-6 w-6 text-sky-500" />
-								<span className="text-slate-700 dark:text-slate-300">
-									{t.feature1Title}: {t.feature1Desc}
-								</span>
-							</li>
-							<li className="flex items-center gap-3">
-								<CheckCircleIcon className="h-6 w-6 text-sky-500" />
-								<span className="text-slate-700 dark:text-slate-300">
-									{t.feature2Title}: {t.feature2Desc}
-								</span>
-							</li>
-							<li className="flex items-center gap-3">
-								<CheckCircleIcon className="h-6 w-6 text-sky-500" />
-								<span className="text-slate-700 dark:text-slate-300">
-									{t.feature3Title}: {t.feature3Desc}
-								</span>
-							</li>
-						</ul>
+						<motion.p className="mt-6 max-w-xl text-lg" variants={itemVariants}>
+							{t.landingSubtitle}
+						</motion.p>
 
-						<Button
-							className="mt-6"
-							// keep component from applying its own bg
-							size="default" // let our classes control sizing
-							onClick={handleScroll}>
-							{t.landingCta}
-						</Button>
-					</div>
+						<motion.ul
+							className="mt-8 space-y-4 text-left"
+							variants={containerVariants}>
+							{features.map((f, i) => (
+								<motion.li
+									key={i}
+									className="flex items-center gap-3"
+									variants={itemVariants}>
+									<CheckCircleIcon className="h-6 w-6 text-sky-500" />
+									<span className="text-slate-700 dark:text-slate-300">
+										{f.title}: {f.desc}
+									</span>
+								</motion.li>
+							))}
+						</motion.ul>
 
-					{/* Right Column: Animated Visual */}
-					<div className="flex items-center justify-center">
+						<motion.div variants={itemVariants}>
+							<Button className="mt-6" size="default" onClick={handleScroll}>
+								{t.landingCta}
+							</Button>
+						</motion.div>
+					</motion.div>
+
+					{/* Right Column */}
+					<motion.div
+						className="flex items-center justify-center"
+						initial={{ opacity: 0, scale: 0.9 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 0.8, ease: "easeOut" }}>
 						<div className="relative w-full max-w-2xl">
-							<div
-								className="w-full rounded-xl border border-slate-200 bg-gray-200 p-1  "
-								style={{ animation: "float 6s ease-in-out infinite" }}>
+							<motion.div
+								className="w-full rounded-xl border border-slate-200 bg-gray-200 p-1"
+								animate={{ y: [0, -15, 0] }}
+								transition={{
+									repeat: Infinity,
+									duration: 6,
+									ease: "easeInOut",
+								}}>
 								<Image
 									width={1600}
 									height={900}
@@ -88,9 +125,9 @@ export default function LandingHero() {
 									alt="CV Maker"
 									src={"/assets/CVmakerMainImg.png"}
 								/>
-							</div>
+							</motion.div>
 						</div>
-					</div>
+					</motion.div>
 				</div>
 			</div>
 		</div>
