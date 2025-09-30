@@ -137,7 +137,7 @@ const NavBar = () => {
 				</Link>
 
 				{/* Navigation and Settings */}
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-4 relative">
 					{/* Desktop Navigation Links */}
 
 					{/* Settings (Theme & Language) */}
