@@ -49,6 +49,7 @@ const translations = {
 		pageFormat: "Page Format",
 		orientation: "Orientation",
 		fonts: "Fonts",
+		present: "Present",
 	},
 	tr: {
 		// Landing Page
@@ -100,6 +101,7 @@ const translations = {
 		pageFormat: "Sayfa Formatı",
 		orientation: "Yönlendirme",
 		fonts: "Fonts",
+		present: "Present",
 	},
 	ar: {
 		// Landing Page
@@ -152,6 +154,7 @@ const translations = {
 		pageFormat: "تنسيق الصفحة",
 		orientation: "الاتجاه",
 		fonts: "Fonts",
+		present: "Present",
 	},
 };
 

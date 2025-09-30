@@ -282,7 +282,8 @@ export const exportToPDF = async ({
 			doc.setFont(activeFont, "normal");
 			doc.setTextColor(COLORS.textLight); // NOTE: The (t as any).present is kept as is to suppress the TypeScript error,
 			// while making sure the resulting text is visible (not white).
-			const endDateText = job.endDate || (t as any).present || "Present";
+			const endDateText = job.endDate || t.present || "Present";
+
 			doc.text(
 				`${job.startDate} - ${endDateText}`,
 				contentWidth + margin,

@@ -69,8 +69,8 @@ export default function LandingHero() {
 						<motion.h1
 							className={`${poppins.className} text-4xl sm:text-5xl max-w-2xl font-extrabold text-transparent bg-clip-text
 								bg-gradient-to-br
-								from-sky-700 via-indigo-600 to-pink-500
-								dark:from-pink-300 dark:via-indigo-100 dark:to-pink-200
+								from-zinc-900 via-indigo-800 to-pink-500
+								dark:from-zinc-200 dark:via-rose-200 dark:to-pink-900
 								drop-shadow-sm uppercase`}
 							variants={itemVariants}>
 							{t.landingTitle}

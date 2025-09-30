@@ -30,7 +30,7 @@ const NavBar = () => {
 	const repo = "RamiMizyed/cv-maker";
 
 	// GitHub stars
-	const [starCount, setStarCount] = useState<number | null>(null);
+	const [starCount, setStarCount] = useState<number>(3);
 	const [starsLoading, setStarsLoading] = useState(false);
 	useEffect(() => {
 		let mounted = true;
@@ -44,7 +44,7 @@ const NavBar = () => {
 				}
 			})
 			.catch(() => {
-				if (mounted) setStarCount(null);
+				if (mounted) setStarCount(3); // Default/fallback value
 			})
 			.finally(() => {
 				if (mounted) setStarsLoading(false);
