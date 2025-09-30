@@ -58,24 +58,29 @@ export default function Editor() {
 	};
 
 	return (
-		<Card className="col-span-1 lg:col-span-2 h-[90svh] sticky top-[6rem]  ">
+		<Card className="col-span-1 lg:col-span-2 h-full   ">
 			<div className="flex flex-col  justify-between items-center ">
 				<h1 className="text-2xl font-bold"> Editor</h1>
 			</div>
-			<div className="flex flex-wrap gap-2 space-x-2 border-b mb-6">
-				{TABS.map((tab) => (
-					<Button
-						key={tab.id}
-						variant={activeTab === tab.id ? "default" : "outline"}
-						onClick={() => setActiveTab(tab.id)}
-						className="flex-1 justify-center">
-						<tab.icon className="h-4 w-4 mr-2" />
-						{t[tab.labelKey]}
-					</Button>
-				))}
+
+			<div className="sticky top-[6rem]">
+				<div className="flex flex-wrap gap-2 space-x-2 border-b mb-6">
+					{TABS.map((tab) => (
+						<Button
+							key={tab.id}
+							variant={activeTab === tab.id ? "default" : "outline"}
+							onClick={() => setActiveTab(tab.id)}
+							className="flex-1 justify-center">
+							<tab.icon className="h-4 w-4 mr-2" />
+							{t[tab.labelKey]}
+						</Button>
+					))}
+				</div>
+				<div className="space-y-6 mb-3 overflow-y-scroll max-h-[100svh] ">
+					{renderTabContent()}
+				</div>
+				<ExportDialog />
 			</div>
-			<div className="space-y-6">{renderTabContent()}</div>
-			<ExportDialog />
 		</Card>
 	);
 }
