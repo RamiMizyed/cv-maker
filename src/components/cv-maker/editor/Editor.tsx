@@ -58,7 +58,7 @@ export default function Editor() {
 	};
 
 	return (
-		<Card className="col-span-1 lg:col-span-2 h-full overflow-y-auto  ">
+		<Card className="col-span-1 lg:col-span-2 h-[90svh] sticky top-[6rem]  ">
 			<div className="flex flex-col  justify-between items-center ">
 				<h1 className="text-2xl font-bold"> Editor</h1>
 			</div>

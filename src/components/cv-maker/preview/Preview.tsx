@@ -63,17 +63,25 @@ const CVPreview = forwardRef<HTMLDivElement>((_, ref) => {
 								</span>
 							)}
 							{personalInfo.website && (
-								<span className="flex items-center gap-1.5">
-									<GlobeIcon className="h-3 w-3" />
+								<a
+									href={`${"https://"}${personalInfo.website}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center text-blue-600 hover:text-blue-700 transition-all gap-1.5">
+									<GithubIcon className="h-3 w-3" />
 									{personalInfo.website}
-								</span>
+								</a>
 							)}
 							{/* This new span displays the GitHub link */}
 							{personalInfo.github && (
-								<span className="flex items-center gap-1.5">
+								<a
+									href={`${"https://"}${personalInfo.github}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center text-blue-600 hover:text-blue-700 transition-all gap-1.5">
 									<GithubIcon className="h-3 w-3" />
 									{personalInfo.github}
-								</span>
+								</a>
 							)}
 						</div>
 						{/* --- END MODIFIED BLOCK --- */}

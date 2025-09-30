@@ -1,8 +1,10 @@
 import jsPDF, { TextOptionsLight } from "jspdf";
-import { CVData } from "@/types/cv";
+// MODIFIED: Import the specific types you need
+import { CVData, Experience, Project, Education } from "@/types/cv";
 import translations from "@/lib/translations"; // Adjust path as needed
 import GOOGLE_FONTS from "@/lib/fontList"; // Import your font list
 
+// NEW: Define the missing ExportOptions interface
 interface ExportOptions {
 	cvData: CVData;
 	lang: "en" | "ar" | "tr";
@@ -11,7 +13,7 @@ interface ExportOptions {
 	orientation: "portrait" | "landscape";
 }
 
-// --- Helper function to get image dimensions while preserving aspect ratio ---
+// --- Helper function to get image dimensions (no changes needed here) ---
 const getImageDimensions = (
 	dataUrl: string
 ): Promise<{ width: number; height: number }> => {
@@ -44,14 +46,12 @@ export const exportToPDF = async ({
 		selectedFont,
 	} = cvData;
 
-	const isRtl = lang === "ar";
 	const t = translations[lang];
 
-	const doc = new jsPDF({ orientation, unit: "pt", format: pageFormat });
+	const isRtl = lang === "ar";
 
-	// --- Font Management ---
-	// (This is your original font management logic. It can be further refactored
-	// into a helper function to reduce repetition if desired).
+	const doc = new jsPDF({ orientation, unit: "pt", format: pageFormat }); // --- Font Management (No changes needed) ---
+
 	const standardFonts = {
 		Helvetica: "helvetica",
 		"Times New Roman": "times",
@@ -111,14 +111,23 @@ export const exportToPDF = async ({
 			}
 		}
 	}
-	doc.setFont(activeFont);
+	doc.setFont(activeFont); // --- Page Setup and Styling Constants ---
 
-	// --- Page Setup ---
 	const pageHeight = doc.internal.pageSize.getHeight();
 	const pageWidth = doc.internal.pageSize.getWidth();
-	const margin = 50;
+	const margin = 40;
 	const contentWidth = pageWidth - margin * 2;
 	let cursorY = margin;
+
+	const COLORS = {
+		textDark: "#000000",
+		textLight: "#4a5568", // Changed to a darker grey for better contrast
+		primary: "#2b6cb0",
+		line: "#e2e8f0",
+		skillBg: "#ebf8ff",
+	};
+
+	doc.setTextColor(COLORS.textDark); // Set initial text color // --- Helper Functions ---
 
 	const checkPageBreak = (spaceNeeded: number) => {
 		if (cursorY + spaceNeeded > pageHeight - margin) {
@@ -130,102 +139,96 @@ export const exportToPDF = async ({
 	const addSectionTitle = (title: string) => {
 		checkPageBreak(40);
 		doc.setFont(activeFont, "bold");
-		doc.setFontSize(12);
-		doc.text(title, margin, cursorY, {
+		doc.setFontSize(14);
+		doc.setTextColor(COLORS.textDark);
+		doc.text(title.toUpperCase(), margin, cursorY, {
 			lang: isRtl ? "ar" : undefined,
 		} as TextOptionsLight);
-		doc.setDrawColor(200);
-		doc.line(margin, cursorY + 4, contentWidth + margin, cursorY + 4);
-		cursorY += 25;
+		cursorY += 8;
+		doc.setDrawColor(COLORS.line);
+		doc.setLineWidth(1);
+		doc.line(margin, cursorY, contentWidth + margin, cursorY);
+		cursorY += 20;
 	};
 
-	// --- Helper for rendering bulleted descriptions with proper spacing ---
 	const addBulletedList = (text: string) => {
+		doc.setFont(activeFont, "normal");
+		doc.setFontSize(10);
+		doc.setTextColor(COLORS.textLight);
 		const bulletPoints = text.split("\n").filter((line) => line.trim() !== "");
-		const bulletPointSpacing = 5; // Additional vertical space between bullet points
+		const bulletPointSpacing = 6;
 
 		bulletPoints.forEach((point) => {
 			const line = `• ${point.trim()}`;
-			// Indent bullet points slightly from the margin
-			const splitLines = doc.splitTextToSize(line, contentWidth - 10);
-
+			const splitLines = doc.splitTextToSize(line, contentWidth - 15);
 			checkPageBreak(doc.getTextDimensions(splitLines).h + bulletPointSpacing);
-
-			doc.text(splitLines, margin + 10, cursorY, {
+			doc.text(splitLines, margin + 15, cursorY, {
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
-
-			cursorY += doc.getTextDimensions(splitLines).h + bulletPointSpacing;
+			cursorY += doc.getTextDimensions(splitLines).h + bulletPointSpacing / 2;
 		});
 	};
 
-	// --- Header ---
-	checkPageBreak(150);
+	const ensureAbsoluteUrl = (url?: string): string => {
+		if (!url) return "";
+		if (url.startsWith("https://") || url.startsWith("http://")) return url;
+		return `https://${url}`;
+	}; // --- Header Section ---
 
-	// ** FIXED: Add Portrait Image, preserving aspect ratio **
+	checkPageBreak(180);
+
 	if (personalInfo.portrait) {
-		const MAX_WIDTH = 100;
-		const MAX_HEIGHT = 100;
-
 		try {
-			const { width, height } = await getImageDimensions(personalInfo.portrait);
-			const aspectRatio = width / height;
+			// Get image dimensions and scale it while maintaining aspect ratio
+			const { width: originalWidth, height: originalHeight } =
+				await getImageDimensions(personalInfo.portrait);
+			const maxImgSize = 80;
+			let imgWidth = maxImgSize;
+			let imgHeight = maxImgSize;
 
-			let imgWidth = MAX_WIDTH;
-			let imgHeight = MAX_WIDTH / aspectRatio;
+			const ratio = originalWidth / originalHeight;
 
-			if (imgHeight > MAX_HEIGHT) {
-				imgHeight = MAX_HEIGHT;
-				imgWidth = MAX_HEIGHT * aspectRatio;
-			}
+			if (ratio > 1) {
+				// Landscape or wide square
+				imgHeight = maxImgSize / ratio;
+			} else if (ratio < 1) {
+				// Portrait or tall square
+				imgWidth = maxImgSize * ratio;
+			} // Center the image
 
-			const imgX = (pageWidth - imgWidth) / 2; // Center the image
+			const imgX = (pageWidth - imgWidth) / 2;
+
 			doc.addImage(
 				personalInfo.portrait,
-				"JPEG", // Can be 'PNG', 'WEBP', etc. depending on image data
+				"JPEG", // Assuming the dataUrl is for a JPEG, change if necessary
 				imgX,
 				cursorY,
 				imgWidth,
 				imgHeight
-			);
-			cursorY += imgHeight + 15;
+			); // Advance cursor by the actual image height
+			cursorY += imgHeight + 45;
 		} catch (error) {
 			console.error("Failed to add portrait image to PDF:", error);
 		}
-	}
+	} // FIX for White Text Issue: Re-assert the text color immediately after image drawing.
 
-	// Name
+	doc.setTextColor(COLORS.textDark);
+
 	doc.setFont(activeFont, "bold");
-	doc.setFontSize(22);
-	doc.text(personalInfo.name, pageWidth / 2, cursorY, {
-		align: "center",
-		lang: isRtl ? "ar" : undefined,
-	} as TextOptionsLight);
-	cursorY += doc.getTextDimensions(personalInfo.name).h + 6;
+	doc.setFontSize(28);
+	doc.text(personalInfo.name, pageWidth / 2, cursorY, { align: "center" });
+	cursorY += doc.getTextDimensions(personalInfo.name).h;
 
-	// Title
 	doc.setFont(activeFont, "normal");
-	doc.setFontSize(14);
-	doc.text(personalInfo.title, pageWidth / 2, cursorY, {
-		align: "center",
-		lang: isRtl ? "ar" : undefined,
-	} as TextOptionsLight);
-	cursorY += doc.getTextDimensions(personalInfo.title).h + 10;
+	doc.setFontSize(16);
+	doc.setTextColor(COLORS.textLight);
+	doc.text(personalInfo.title, pageWidth / 2, cursorY, { align: "center" });
+	cursorY += doc.getTextDimensions(personalInfo.title).h + 20;
 
-	// ** IMPROVED: Contact Info with Clickable Links **
-	doc.setFontSize(10);
-	const ensureAbsoluteUrl = (url?: string): string => {
-		if (!url) return "";
-		// If it already has a protocol, leave it as is.
-		if (url.startsWith("https://") || url.startsWith("http://")) {
-			return url;
-		}
-		// Otherwise, add the protocol.
-		return `https://${url}`;
-	};
+	doc.setFontSize(9);
 	const contactInfo = [
-		{ text: personalInfo.phone, link: `tel:${personalInfo.phone}` },
 		{ text: personalInfo.email, link: `mailto:${personalInfo.email}` },
+		{ text: personalInfo.phone, link: `tel:${personalInfo.phone}` },
 		{
 			text: personalInfo.website,
 			link: ensureAbsoluteUrl(personalInfo.website),
@@ -233,7 +236,7 @@ export const exportToPDF = async ({
 		{ text: personalInfo.github, link: ensureAbsoluteUrl(personalInfo.github) },
 	].filter((item) => item.text && item.text.trim() !== "");
 
-	const separator = " | ";
+	const separator = "  •  ";
 	const fullText = contactInfo.map((c) => c.text).join(separator);
 	const textWidth = doc.getTextWidth(fullText);
 	let currentX = (pageWidth - textWidth) / 2;
@@ -241,134 +244,167 @@ export const exportToPDF = async ({
 	contactInfo.forEach((item, index) => {
 		if (!item.text) return;
 		const itemWidth = doc.getTextWidth(item.text);
-
-		doc.setTextColor("#0000EE"); // Standard link blue
+		doc.setTextColor(COLORS.primary);
 		doc.textWithLink(item.text, currentX, cursorY, { url: item.link });
-		doc.setTextColor("#000000"); // Reset to black
-
 		currentX += itemWidth;
 
 		if (index < contactInfo.length - 1) {
+			doc.setTextColor(COLORS.textLight);
 			doc.text(separator, currentX, cursorY);
 			currentX += doc.getTextWidth(separator);
 		}
 	});
-	cursorY += 30;
+	cursorY += 35; // --- Summary Section ---
 
-	// --- Summary ---
 	if (personalInfo.summary) {
 		addSectionTitle(t.summary);
 		doc.setFont(activeFont, "normal");
 		doc.setFontSize(10);
+		doc.setTextColor(COLORS.textLight);
 		const splitSummary = doc.splitTextToSize(
 			personalInfo.summary,
 			contentWidth
 		);
-		doc.text(splitSummary, margin, cursorY, {
-			lang: isRtl ? "ar" : undefined,
-		} as TextOptionsLight);
-		cursorY += doc.getTextDimensions(splitSummary).h + 20;
-	}
+		doc.text(splitSummary, margin, cursorY);
+		cursorY += doc.getTextDimensions(splitSummary).h + 25;
+	} // --- Experience Section ---
 
-	// --- Experience ---
 	if (experience && experience.length > 0) {
-		addSectionTitle(t.experience);
-		experience.forEach((job) => {
-			checkPageBreak(50);
+		addSectionTitle(t.experience); // MODIFIED: Added explicit type for 'job'
+		experience.forEach((job: Experience) => {
+			checkPageBreak(60);
+
 			doc.setFont(activeFont, "bold");
 			doc.setFontSize(11);
-			doc.text(job.position, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
+			doc.setTextColor(COLORS.textDark);
+			doc.text(job.position, margin, cursorY);
 
-			const endDateText =
-				job.endDate || ("present" in t && t.present) || "Present";
+			doc.setFont(activeFont, "normal");
+			doc.setTextColor(COLORS.textLight); // NOTE: The (t as any).present is kept as is to suppress the TypeScript error,
+			// while making sure the resulting text is visible (not white).
+			const endDateText = job.endDate || (t as any).present || "Present";
 			doc.text(
 				`${job.startDate} - ${endDateText}`,
 				contentWidth + margin,
 				cursorY,
-				{ align: "right", lang: isRtl ? "ar" : undefined } as TextOptionsLight
+				{ align: "right" }
 			);
-
-			cursorY += 12;
-			doc.setFont(activeFont, "normal");
-			doc.setFontSize(10);
-			doc.text(job.company, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
 			cursorY += 15;
 
-			// ** FIXED: Use bulleted list helper for descriptions **
+			doc.setFont(activeFont, "italic");
+			doc.setFontSize(10);
+			doc.setTextColor(COLORS.primary);
+			doc.text(job.company, margin, cursorY);
+			cursorY += 20;
+
 			if (job.description) {
-				doc.setFont(activeFont, "normal");
-				doc.setFontSize(10);
 				addBulletedList(job.description);
 			}
-			cursorY += 10; // Extra space after the entire job entry
+			cursorY += 15;
 		});
-	}
+	} // --- Projects Section ---
 
-	// --- Education ---
-	if (education && education.length > 0) {
-		addSectionTitle(t.education);
-		education.forEach((edu) => {
-			checkPageBreak(30);
+	if (projects && projects.length > 0) {
+		addSectionTitle(t.projects); // MODIFIED: Added explicit type for 'proj'
+		projects.forEach((proj: Project) => {
+			checkPageBreak(50);
+
 			doc.setFont(activeFont, "bold");
 			doc.setFontSize(11);
-			doc.text(edu.degree, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
+			doc.setTextColor(COLORS.textDark);
+			doc.text(proj.name, margin, cursorY);
+
+			if (proj.link) {
+				const linkText = proj.link.replace(/^(https?:\/\/)?(www\.)?/, "");
+				const linkWidth = doc.getTextWidth(linkText);
+				doc.setFontSize(9);
+				doc.setTextColor(COLORS.primary);
+				doc.textWithLink(linkText, contentWidth + margin - linkWidth, cursorY, {
+					url: ensureAbsoluteUrl(proj.link),
+				});
+			}
+			cursorY += 15;
+
+			doc.setFont(activeFont, "italic");
+			doc.setFontSize(10);
+			doc.setTextColor(COLORS.primary);
+			doc.text(proj.technologies, margin, cursorY);
+			cursorY += 20;
+
+			if (proj.description) {
+				addBulletedList(proj.description);
+			}
+			cursorY += 15;
+		});
+	} // --- Education Section ---
+
+	if (education && education.length > 0) {
+		addSectionTitle(t.education); // MODIFIED: Added explicit type for 'edu'
+		education.forEach((edu: Education) => {
+			checkPageBreak(40);
+			doc.setFont(activeFont, "bold");
+			doc.setFontSize(11);
+			doc.setTextColor(COLORS.textDark);
+			doc.text(edu.degree, margin, cursorY);
+
+			doc.setFont(activeFont, "normal");
+			doc.setTextColor(COLORS.textLight);
 			doc.text(
 				`${edu.startDate} - ${edu.endDate}`,
 				contentWidth + margin,
 				cursorY,
-				{ align: "right", lang: isRtl ? "ar" : undefined } as TextOptionsLight
+				{ align: "right" }
 			);
-			cursorY += 12;
+			cursorY += 15;
+
 			doc.setFont(activeFont, "normal");
 			doc.setFontSize(10);
-			doc.text(edu.institution, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
-			cursorY += 15;
+			doc.setTextColor(COLORS.primary);
+			doc.text(edu.institution, margin, cursorY);
+			cursorY += 25;
 		});
-	}
+	} // --- Skills Section ---
 
-	// --- Projects ---
-	if (projects && projects.length > 0) {
-		addSectionTitle(t.projects);
-		projects.forEach((proj) => {
-			checkPageBreak(40);
-			doc.setFont(activeFont, "bold");
-			doc.setFontSize(11);
-			doc.text(proj.name, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
-			cursorY += 15;
-
-			if (proj.description) {
-				doc.setFont(activeFont, "normal");
-				doc.setFontSize(10);
-				// Use the bullet helper here too if descriptions can have multiple lines
-				addBulletedList(proj.description);
-			}
-			cursorY += 10;
-		});
-	}
-
-	// --- Skills ---
 	if (skills) {
 		addSectionTitle(t.skills);
 		doc.setFont(activeFont, "normal");
-		doc.setFontSize(10);
-		const splitSkills = doc.splitTextToSize(skills, contentWidth);
-		doc.text(splitSkills, margin, cursorY, {
-			lang: isRtl ? "ar" : undefined,
-		} as TextOptionsLight);
-		cursorY += doc.getTextDimensions(splitSkills).h + 10;
-	}
+		doc.setFontSize(9);
 
-	// --- Save File ---
+		const skillPills = skills
+			.split(",")
+			.map((s) => s.trim())
+			.filter((s) => s);
+		const pillPaddingX = 10;
+		const pillPaddingY = 5;
+		const pillHeight = doc.getTextDimensions("T").h + pillPaddingY * 2;
+		const pillGap = 8;
+		let currentX = margin;
+
+		checkPageBreak(pillHeight + pillGap); // MODIFIED: Added explicit type for 'skill'
+
+		skillPills.forEach((skill: string) => {
+			const textWidth = doc.getTextWidth(skill);
+			const pillWidth = textWidth + pillPaddingX * 2;
+
+			if (currentX + pillWidth > pageWidth - margin) {
+				cursorY += pillHeight + pillGap;
+				currentX = margin;
+				checkPageBreak(pillHeight + pillGap);
+			}
+
+			doc.setFillColor(COLORS.skillBg);
+			doc.roundedRect(currentX, cursorY, pillWidth, pillHeight, 5, 5, "F");
+
+			doc.setTextColor(COLORS.primary);
+			doc.text(skill, currentX + pillPaddingX, cursorY + pillHeight / 2, {
+				baseline: "middle",
+			});
+
+			currentX += pillWidth + pillGap;
+		});
+		cursorY += pillHeight + 20;
+	} // --- Save File ---
+
 	const defaultFilename = `${
 		personalInfo.name.replace(/\s+/g, "_") || "CV"
 	}.pdf`;
