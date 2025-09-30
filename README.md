@@ -1,6 +1,6 @@
 # CV Maker
 
-![CV Maker preview](https://raw.githubusercontent.com/RamiMizyed/cv-maker/main/public/assets/CVmakerMainImg.png)
+![CV Maker preview](https://github.com/RamiMizyed/cv-maker/blob/master/public/assets/CVmakerMainImg.png)
 
 A browser-side CV / resume builder by **Rami Mizyed**. Build, customize and export professional CVs in English, Arabic (RTL) and Turkish — no server required.
 
