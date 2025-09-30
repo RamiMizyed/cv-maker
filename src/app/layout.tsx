@@ -5,7 +5,7 @@ import { LangProvider } from "@/lib/lang";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { ThemeProvider } from "next-themes";
 import NavBar from "@/components/ui/navBar";
-
+import { Analytics } from "@vercel/analytics/next";
 const geistSans = Geist({
 	variable: "--font-geist-sans",
 	subsets: ["latin"],
@@ -91,6 +91,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					<Analytics />
 					<LangProvider>
 						<SmoothScroll>
 							<NavBar />
