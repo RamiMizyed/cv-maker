@@ -1,23 +1,30 @@
-'use client";';
+"use client";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useLang, Lang } from "@/lib/lang";
+
 const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
 	{ code: "en", label: "English", flag: "🇺🇸" },
 	{ code: "tr", label: "Turkish", flag: "🇹🇷" },
 	{ code: "ar", label: "Arabic", flag: "🇸🇦" },
 ];
+
 export default function SettingsToggle() {
 	const { lang, setLang } = useLang();
-	const { theme, setTheme } = useTheme();
+	// ✨ FIX: Destructure resolvedTheme from useTheme
+	const { theme, setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 	const [nextLang, setNextLang] = useState(lang);
+	// ✨ FIX: Initialize nextTheme with the actual theme state
 	const [nextTheme, setNextTheme] = useState(theme);
 	const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
 	useEffect(() => setMounted(true), []);
-	if (!mounted) return null;
+
+	// ✨ FIX: Also check for resolvedTheme to prevent hydration issues
+	if (!mounted || !resolvedTheme) return null;
 
 	const handleLangChange = (newLang: typeof lang) => {
 		if (newLang === lang || isTransitioning) return;
@@ -27,12 +34,14 @@ export default function SettingsToggle() {
 
 	const toggleTheme = () => {
 		if (isTransitioning) return;
-		setNextTheme(theme === "dark" ? "light" : "dark");
+		// ✨ FIX: Base the toggle logic on resolvedTheme
+		setNextTheme(resolvedTheme === "dark" ? "light" : "dark");
 		setIsTransitioning(true);
 	};
 
 	const onAnimationComplete = () => {
 		if (nextLang !== lang) setLang(nextLang);
+		// ✨ FIX: Compare nextTheme with the actual theme
 		if (nextTheme && nextTheme !== theme) setTheme(nextTheme);
 		setIsTransitioning(false);
 	};
@@ -101,13 +110,15 @@ export default function SettingsToggle() {
 				onClick={toggleTheme}
 				className="relative flex hover:cursor-pointer transition-all duration-300 group  h-10 w-10 items-center justify-center hover:bg-primary rounded-full bg-secondary text-secondary-foreground overflow-hidden">
 				<motion.span
-					key={theme}
+					// ✨ FIX: Key the animation to resolvedTheme to ensure it runs correctly
+					key={resolvedTheme}
 					initial={{ rotate: -180, opacity: 0 }}
 					animate={{ rotate: 0, opacity: 1 }}
 					exit={{ rotate: 180, opacity: 0 }}
 					transition={{ duration: 0.5, ease: "easeInOut" }}
 					className="text-lg relative z-10 ">
-					{theme === "dark" ? "🌙" : "☀️"}
+					{/* ✨ FIX: Display the emoji based on resolvedTheme */}
+					{resolvedTheme === "dark" ? "🌙" : "☀️"}
 				</motion.span>
 			</button>
 		</div>
