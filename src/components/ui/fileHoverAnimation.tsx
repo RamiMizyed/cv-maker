@@ -55,7 +55,7 @@ const FolderIcon = ({
 				<g filter="url(#filter0_d_2_28)">
 					{/* Folder Back */}
 					<motion.path
-						className="fill-yellow-800/90 dark:fill-indigo-900 z-50"
+						className="fill-yellow-800/90 dark:fill-rose-400 z-50"
 						style={{ transformOrigin: "100px 40px" }}
 						variants={lidVariants}
 						animate={isOpen ? "open" : "closed"}
@@ -139,7 +139,7 @@ const FolderIcon = ({
 						variants={lidVariants}
 						animate={isOpen ? "open" : "closed"}
 						transition={{ type: "spring", stiffness: 200, damping: 18 }}
-						className={"fill-yellow-600 dark:fill-indigo-700 z-50 "}
+						className={"fill-yellow-600 dark:fill-rose-500 z-50 "}
 						d="M488 399H85c-5.523 0-10-4.477-10-10V171.445c0-5.523 4.477-10 10-10h206.25c3.959 0 7.546-2.336 9.146-5.957l7.749-17.529c1.6-3.621 5.187-5.959 9.147-5.959H488c5.523 0 10 4.477 10 10v247c0 5.523-4.477 10-10 10Z"
 						stroke="url(#folderGlowStroke)"
 						strokeWidth="3"
@@ -318,7 +318,7 @@ const FileUploadCard = ({
 				onDragOver={(e) => e.preventDefault()}
 				onDrop={handleDrop}
 				onClick={() => fileInputRef.current?.click()}
-				className="relative w-full flex flex-col items-center justify-center  text-center overflow-hidden cursor-pointer"
+				className="relative w-full flex flex-col xl:flex-row items-center justify-center  text-center overflow-hidden cursor-pointer"
 				animate={{
 					borderColor: isDragging ? "rgb(34 197 94)" : "rgb(31 41 55)",
 				}}>
