@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "@/lib/lang";
@@ -16,7 +16,9 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
+// ✅ Fix: set metadataBase so OG/Twitter images resolve properly
 export const metadata: Metadata = {
+	metadataBase: new URL("https://ramimizyed.dev"),
 	title: "CV Maker - Client Side CV Builder",
 	description:
 		"Browser-side CV builder by Rami Mizyed. Create professional CVs with multilingual support (English, Arabic, Turkish).",
@@ -35,9 +37,7 @@ export const metadata: Metadata = {
 	authors: [{ name: "Rami Mizyed", url: "https://ramimizyed.dev" }],
 	creator: "Rami Mizyed",
 	publisher: "Rami Mizyed",
-	viewport: { width: "device-width", initialScale: 1 },
 	robots: { index: true, follow: true },
-	colorScheme: "light dark",
 	openGraph: {
 		title: "CV Maker — Rami Mizyed",
 		description:
@@ -61,12 +61,20 @@ export const metadata: Metadata = {
 		description:
 			"Create professional CVs in English, Arabic and Turkish — all in the browser.",
 		creator: "@RamiMizyed",
+		images: ["/assets/CVmakerMainImg.png"],
 	},
 	icons: {
 		icon: "/favicon.ico",
 		shortcut: "/favicon.ico",
 		apple: "/apple-touch-icon.png",
 	},
+};
+
+// ✅ Fix: Move viewport & themeColor out of metadata
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	colorScheme: "light dark",
 	themeColor: [
 		{ media: "(prefers-color-scheme: light)", color: "#ffffff" },
 		{ media: "(prefers-color-scheme: dark)", color: "#0f172a" },
@@ -75,9 +83,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
-}: Readonly<{
+}: {
 	children: React.ReactNode;
-}>) {
+}) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body

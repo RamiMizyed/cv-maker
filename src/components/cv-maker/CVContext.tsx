@@ -32,8 +32,8 @@ const getInitialState = (lang: string): CVData => ({
 		title: "Senior Frontend Developer",
 		email: "alex.johnson.dev@example.com",
 		phone: "+1 (555) 987-6543",
-		website: "alexjohnson.dev",
-		github: "github.com/alexjohnson",
+		website: "ramimizyed.dev",
+		github: "github.com/ramimizyed",
 		summary:
 			"Creative and detail-oriented Senior Frontend Developer with 7+ years of experience building scalable web applications. Passionate about crafting clean user experiences, leading engineering teams, and driving accessibility and performance improvements.",
 		portrait: "/assets/Cat_01.png",
@@ -46,9 +46,9 @@ const getInitialState = (lang: string): CVData => ({
 			startDate: "Jan 2021",
 			endDate: "Present",
 			description:
-				"• Led a team of 5 engineers in developing a design system adopted across 3 company products.\n" +
-				"• Architected and migrated a legacy React codebase to Next.js with TypeScript, reducing load times by 35%.\n" +
-				"• Collaborated with designers and product managers to deliver accessible, responsive interfaces used by 1M+ users.",
+				"Led a team of 5 engineers in developing a design system adopted across 3 company products.\n" +
+				"Architected and migrated a legacy React codebase to Next.js with TypeScript, reducing load times by 35%.\n" +
+				"Collaborated with designers and product managers to deliver accessible, responsive interfaces used by 1M+ users.",
 		},
 		{
 			id: 2,
@@ -57,9 +57,9 @@ const getInitialState = (lang: string): CVData => ({
 			startDate: "Jun 2017",
 			endDate: "Dec 2020",
 			description:
-				"• Developed marketing websites and e-commerce stores with custom CMS integrations.\n" +
-				"• Built reusable React components and animations that improved engagement and reduced bounce rates.\n" +
-				"• Worked directly with clients to translate business requirements into technical solutions.",
+				"Developed marketing websites and e-commerce stores with custom CMS integrations.\n" +
+				"Built reusable React components and animations that improved engagement and reduced bounce rates.\n" +
+				"Worked directly with clients to translate business requirements into technical solutions.",
 		},
 		{
 			id: 3,
@@ -68,9 +68,9 @@ const getInitialState = (lang: string): CVData => ({
 			startDate: "Aug 2015",
 			endDate: "May 2017",
 			description:
-				"• Supported the development of early-stage SaaS products.\n" +
-				"• Wrote modular JavaScript, optimized CSS, and improved SEO performance.\n" +
-				"• Learned agile methodologies and collaborated in cross-functional teams.",
+				"Supported the development of early-stage SaaS products.\n" +
+				"Wrote modular JavaScript, optimized CSS, and improved SEO performance.\n" +
+				"Learned agile methodologies and collaborated in cross-functional teams.",
 		},
 	],
 	education: [
@@ -87,8 +87,8 @@ const getInitialState = (lang: string): CVData => ({
 			id: 1,
 			name: "GreenTrack – Sustainability Dashboard",
 			description:
-				"• Developed an interactive dashboard visualizing environmental data with charts and 3D models.\n" +
-				"• Integrated APIs for live CO₂ tracking and renewable energy stats.",
+				"Developed an interactive dashboard visualizing environmental data with charts and 3D models.\n" +
+				"Integrated APIs for live CO₂ tracking and renewable energy stats.",
 			link: "github.com/alexjohnson/greentrack",
 			technologies: "React, Next.js, D3.js, TailwindCSS",
 		},
@@ -96,8 +96,8 @@ const getInitialState = (lang: string): CVData => ({
 			id: 2,
 			name: "DevConnect – Networking Platform",
 			description:
-				"• Created a platform for developers to showcase portfolios, post blogs, and connect with peers.\n" +
-				"• Implemented authentication, profile customization, and a real-time chat feature.",
+				"Created a platform for developers to showcase portfolios, post blogs, and connect with peers.\n" +
+				"Implemented authentication, profile customization, and a real-time chat feature.",
 			link: "github.com/alexjohnson/devconnect",
 			technologies: "Next.js, TypeScript, Firebase, Chakra UI",
 		},
@@ -105,8 +105,8 @@ const getInitialState = (lang: string): CVData => ({
 			id: 3,
 			name: "E-commerce Storefront",
 			description:
-				"• Designed and developed a modern, responsive e-commerce storefront with secure checkout.\n" +
-				"• Implemented product filtering, reviews, and Stripe integration.",
+				"Designed and developed a modern, responsive e-commerce storefront with secure checkout.\n" +
+				"Implemented product filtering, reviews, and Stripe integration.",
 			link: "github.com/alexjohnson/ecommerce",
 			technologies: "React, Node.js, Express, PostgreSQL, Stripe API",
 		},

@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { useCV } from "../CVContext";
-import { exportToPDF } from "../pdfExporter";
+import { exportToPDF } from "../../../lib/pdfExporter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

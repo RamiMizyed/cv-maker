@@ -11,6 +11,23 @@ interface ExportOptions {
 	orientation: "portrait" | "landscape";
 }
 
+// --- Helper function to get image dimensions while preserving aspect ratio ---
+const getImageDimensions = (
+	dataUrl: string
+): Promise<{ width: number; height: number }> => {
+	return new Promise((resolve, reject) => {
+		const img = new Image();
+		img.onload = () => {
+			resolve({ width: img.width, height: img.height });
+		};
+		img.onerror = (err) => {
+			console.error("Failed to load image for dimension reading.", err);
+			reject(err);
+		};
+		img.src = dataUrl;
+	});
+};
+
 export const exportToPDF = async ({
 	cvData,
 	lang,
@@ -33,7 +50,8 @@ export const exportToPDF = async ({
 	const doc = new jsPDF({ orientation, unit: "pt", format: pageFormat });
 
 	// --- Font Management ---
-	// (This section remains unchanged)
+	// (This is your original font management logic. It can be further refactored
+	// into a helper function to reduce repetition if desired).
 	const standardFonts = {
 		Helvetica: "helvetica",
 		"Times New Roman": "times",
@@ -121,25 +139,56 @@ export const exportToPDF = async ({
 		cursorY += 25;
 	};
 
-	// --- Header ---
-	checkPageBreak(150); // Increased space for header
+	// --- Helper for rendering bulleted descriptions with proper spacing ---
+	const addBulletedList = (text: string) => {
+		const bulletPoints = text.split("\n").filter((line) => line.trim() !== "");
+		const bulletPointSpacing = 5; // Additional vertical space between bullet points
 
-	// ** NEW: Add Portrait Image **
+		bulletPoints.forEach((point) => {
+			const line = `• ${point.trim()}`;
+			// Indent bullet points slightly from the margin
+			const splitLines = doc.splitTextToSize(line, contentWidth - 10);
+
+			checkPageBreak(doc.getTextDimensions(splitLines).h + bulletPointSpacing);
+
+			doc.text(splitLines, margin + 10, cursorY, {
+				lang: isRtl ? "ar" : undefined,
+			} as TextOptionsLight);
+
+			cursorY += doc.getTextDimensions(splitLines).h + bulletPointSpacing;
+		});
+	};
+
+	// --- Header ---
+	checkPageBreak(150);
+
+	// ** FIXED: Add Portrait Image, preserving aspect ratio **
 	if (personalInfo.portrait) {
-		const imgWidth = 160;
-		const imgHeight = 160;
-		const imgX = (pageWidth - imgWidth) / 2; // Center the image
+		const MAX_WIDTH = 100;
+		const MAX_HEIGHT = 100;
+
 		try {
-			// Assuming the portrait is a base64 data URL (e.g., from a file upload)
+			const { width, height } = await getImageDimensions(personalInfo.portrait);
+			const aspectRatio = width / height;
+
+			let imgWidth = MAX_WIDTH;
+			let imgHeight = MAX_WIDTH / aspectRatio;
+
+			if (imgHeight > MAX_HEIGHT) {
+				imgHeight = MAX_HEIGHT;
+				imgWidth = MAX_HEIGHT * aspectRatio;
+			}
+
+			const imgX = (pageWidth - imgWidth) / 2; // Center the image
 			doc.addImage(
 				personalInfo.portrait,
-				"JPEG",
+				"JPEG", // Can be 'PNG', 'WEBP', etc. depending on image data
 				imgX,
 				cursorY,
 				imgWidth,
 				imgHeight
 			);
-			cursorY += imgHeight + 15; // Add space after the image
+			cursorY += imgHeight + 15;
 		} catch (error) {
 			console.error("Failed to add portrait image to PDF:", error);
 		}
@@ -161,25 +210,50 @@ export const exportToPDF = async ({
 		align: "center",
 		lang: isRtl ? "ar" : undefined,
 	} as TextOptionsLight);
-	cursorY += doc.getTextDimensions(personalInfo.title).h + 6;
+	cursorY += doc.getTextDimensions(personalInfo.title).h + 10;
 
-	// Contact Info
-	doc.setFont(activeFont, "normal");
+	// ** IMPROVED: Contact Info with Clickable Links **
 	doc.setFontSize(10);
-	const contacts = [
-		personalInfo.phone,
-		personalInfo.email,
-		personalInfo.website,
-		personalInfo.github,
-	].filter(Boolean);
-	const contactText = contacts.join(" | ");
-	doc.text(contactText, pageWidth / 2, cursorY, {
-		align: "center",
-		lang: isRtl ? "ar" : undefined,
-	} as TextOptionsLight);
-	cursorY += 30;
+	const ensureAbsoluteUrl = (url?: string): string => {
+		if (!url) return "";
+		// If it already has a protocol, leave it as is.
+		if (url.startsWith("https://") || url.startsWith("http://")) {
+			return url;
+		}
+		// Otherwise, add the protocol.
+		return `https://${url}`;
+	};
+	const contactInfo = [
+		{ text: personalInfo.phone, link: `tel:${personalInfo.phone}` },
+		{ text: personalInfo.email, link: `mailto:${personalInfo.email}` },
+		{
+			text: personalInfo.website,
+			link: ensureAbsoluteUrl(personalInfo.website),
+		},
+		{ text: personalInfo.github, link: ensureAbsoluteUrl(personalInfo.github) },
+	].filter((item) => item.text && item.text.trim() !== "");
 
-	// --- The rest of the sections (Summary, Experience, etc.) remain unchanged ---
+	const separator = " | ";
+	const fullText = contactInfo.map((c) => c.text).join(separator);
+	const textWidth = doc.getTextWidth(fullText);
+	let currentX = (pageWidth - textWidth) / 2;
+
+	contactInfo.forEach((item, index) => {
+		if (!item.text) return;
+		const itemWidth = doc.getTextWidth(item.text);
+
+		doc.setTextColor("#0000EE"); // Standard link blue
+		doc.textWithLink(item.text, currentX, cursorY, { url: item.link });
+		doc.setTextColor("#000000"); // Reset to black
+
+		currentX += itemWidth;
+
+		if (index < contactInfo.length - 1) {
+			doc.text(separator, currentX, cursorY);
+			currentX += doc.getTextWidth(separator);
+		}
+	});
+	cursorY += 30;
 
 	// --- Summary ---
 	if (personalInfo.summary) {
@@ -206,33 +280,31 @@ export const exportToPDF = async ({
 			doc.text(job.position, margin, cursorY, {
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
+
 			const endDateText =
-				job.endDate || (t as { [key: string]: string }).present || "Present";
+				job.endDate || ("present" in t && t.present) || "Present";
 			doc.text(
 				`${job.startDate} - ${endDateText}`,
 				contentWidth + margin,
 				cursorY,
 				{ align: "right", lang: isRtl ? "ar" : undefined } as TextOptionsLight
 			);
+
 			cursorY += 12;
 			doc.setFont(activeFont, "normal");
 			doc.setFontSize(10);
-			doc.text(`${job.company}`, margin, cursorY, {
+			doc.text(job.company, margin, cursorY, {
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
 			cursorY += 15;
+
+			// ** FIXED: Use bulleted list helper for descriptions **
 			if (job.description) {
 				doc.setFont(activeFont, "normal");
 				doc.setFontSize(10);
-				const splitDesc = doc.splitTextToSize(
-					`- ${job.description}`,
-					contentWidth
-				);
-				doc.text(splitDesc, margin, cursorY, {
-					lang: isRtl ? "ar" : undefined,
-				} as TextOptionsLight);
-				cursorY += doc.getTextDimensions(splitDesc).h + 10;
+				addBulletedList(job.description);
 			}
+			cursorY += 10; // Extra space after the entire job entry
 		});
 	}
 
@@ -255,7 +327,7 @@ export const exportToPDF = async ({
 			cursorY += 12;
 			doc.setFont(activeFont, "normal");
 			doc.setFontSize(10);
-			doc.text(`${edu.institution}`, margin, cursorY, {
+			doc.text(edu.institution, margin, cursorY, {
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
 			cursorY += 15;
@@ -272,14 +344,15 @@ export const exportToPDF = async ({
 			doc.text(proj.name, margin, cursorY, {
 				lang: isRtl ? "ar" : undefined,
 			} as TextOptionsLight);
-			cursorY += 12;
-			doc.setFont(activeFont, "normal");
-			doc.setFontSize(10);
-			const splitDesc = doc.splitTextToSize(proj.description, contentWidth);
-			doc.text(splitDesc, margin, cursorY, {
-				lang: isRtl ? "ar" : undefined,
-			} as TextOptionsLight);
-			cursorY += doc.getTextDimensions(splitDesc).h + 15;
+			cursorY += 15;
+
+			if (proj.description) {
+				doc.setFont(activeFont, "normal");
+				doc.setFontSize(10);
+				// Use the bullet helper here too if descriptions can have multiple lines
+				addBulletedList(proj.description);
+			}
+			cursorY += 10;
 		});
 	}
 
