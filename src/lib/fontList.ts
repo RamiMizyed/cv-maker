@@ -92,11 +92,6 @@ const GOOGLE_FONTS = {
 			value: "Montserrat",
 			path: "/fonts/Montserrat-VariableFont_wght.ttf",
 		},
-		{
-			label: "Source Sans 3",
-			value: "Source Sans 3",
-			path: "/fonts/SourceSans3-VariableFont_wght.ttf",
-		},
 	],
 };
 

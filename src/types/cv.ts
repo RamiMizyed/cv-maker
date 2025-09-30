@@ -1,6 +1,7 @@
 // components/cv-maker/types.ts
 
 export type TabId =
+	| "fonts"
 	| "personal"
 	| "experience"
 	| "education"

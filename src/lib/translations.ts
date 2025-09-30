@@ -48,6 +48,7 @@ const translations = {
 		fileName: "File Name",
 		pageFormat: "Page Format",
 		orientation: "Orientation",
+		fonts: "Fonts",
 	},
 	tr: {
 		// Landing Page
@@ -98,6 +99,7 @@ const translations = {
 		fileName: "Dosya Adı",
 		pageFormat: "Sayfa Formatı",
 		orientation: "Yönlendirme",
+		fonts: "Fonts",
 	},
 	ar: {
 		// Landing Page
@@ -149,6 +151,7 @@ const translations = {
 		fileName: "اسم الملف",
 		pageFormat: "تنسيق الصفحة",
 		orientation: "الاتجاه",
+		fonts: "Fonts",
 	},
 };
 

@@ -7,22 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+
 import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
-import GOOGLE_FONTS from "@/lib/fontList";
 
 export default function PersonalInfoForm() {
 	const { state, dispatch } = useCV();
-	const { personalInfo, selectedFont } = state;
+	const { personalInfo } = state;
 	const { lang } = useLang();
 	const t = translations[lang];
 
@@ -56,36 +47,6 @@ export default function PersonalInfoForm() {
 	return (
 		<Card>
 			<CardContent className=" space-y-4">
-				<div>
-					<Label className="mb-2" htmlFor="font-selector">
-						Font
-					</Label>
-					<Select
-						value={selectedFont}
-						onValueChange={(value) => {
-							dispatch({ type: "SET_FONT", payload: value });
-							console.log("Font changed to:", value);
-						}}>
-						<SelectTrigger id="font-selector">
-							<SelectValue placeholder="Select a font" />
-						</SelectTrigger>
-						<SelectContent>
-							{Object.entries(GOOGLE_FONTS).map(([langKey, fonts]) => (
-								<SelectGroup key={langKey}>
-									<SelectLabel className="border-b">
-										{langKey.substring(0, 2).toUpperCase()}
-									</SelectLabel>
-									{fonts.map((font) => (
-										<SelectItem key={font.value} value={font.value}>
-											{font.label}
-										</SelectItem>
-									))}
-								</SelectGroup>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<Label htmlFor="name">{t.fullName}</Label>

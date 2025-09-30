@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLang } from "@/lib/lang"; // Assuming your lang hook is here
 import { Button } from "../ui/button";
 import SettingsToggle from "./themeToggle";
+import { GitBranch, Star } from "lucide-react";
 
 // --- TRANSLATIONS ---
 const translations = {
@@ -24,6 +25,34 @@ const NavBar = () => {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isScrollingDown, setIsScrollingDown] = useState(false);
 	const lastScrollY = useRef(0);
+
+	// GitHub repo (moved to component scope so JSX can access it)
+	const repo = "RamiMizyed/cv-maker";
+
+	// GitHub stars
+	const [starCount, setStarCount] = useState<number | null>(null);
+	const [starsLoading, setStarsLoading] = useState(false);
+	useEffect(() => {
+		let mounted = true;
+		const url = `https://api.github.com/repos/${repo}`;
+		setStarsLoading(true);
+		fetch(url)
+			.then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+			.then((data) => {
+				if (mounted && typeof data.stargazers_count === "number") {
+					setStarCount(data.stargazers_count);
+				}
+			})
+			.catch(() => {
+				if (mounted) setStarCount(null);
+			})
+			.finally(() => {
+				if (mounted) setStarsLoading(false);
+			});
+		return () => {
+			mounted = false;
+		};
+	}, [repo]);
 
 	// --- Helper for smooth scrolling ---
 	const scrollToSection = (sectionId: string) => {
@@ -71,9 +100,28 @@ const NavBar = () => {
 										: "bg-transparent border-b border-transparent"
 								}`}>
 			{/* ✅ This inner container matches your content's max-width */}
-			<div className="mx-auto flex h-20 container items-center justify-between px-6 sm:px-8">
+			<div className="mx-auto relative flex h-20 container items-center justify-between px-6 sm:px-8">
+				{/* Centered GitHub star button */}
+				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:block">
+					<Button
+						className="flex items-center gap-2"
+						onClick={() => window.open(`https://github.com/${repo}`, "_blank")}
+						disabled={starsLoading}
+						title={`Star ${repo} on GitHub`}>
+						<GitBranch />
+						<span>Star repo</span>
+						<div className="w-[1px] h-full bg-white"></div>
+						<Star className=" h-4 w-4" />
+						<span className=" text-sm ">
+							{starCount !== null
+								? new Intl.NumberFormat().format(starCount)
+								: "—"}
+						</span>
+					</Button>
+				</div>
+
 				{/* Logo */}
-				<Link href="/" aria-label="Back to homepage">
+				<Link href="http://ramimizyed.dev/" aria-label="Back to homepage">
 					<svg
 						className="w-10 fill-foreground"
 						viewBox="0 0 114 86"

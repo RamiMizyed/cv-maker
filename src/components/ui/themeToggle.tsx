@@ -42,7 +42,7 @@ export default function SettingsToggle() {
 			<div className="relative">
 				<button
 					onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-					className="flex items-center gap-2 bg-secondary text-secondary-foreground rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary/80 transition">
+					className="flex items-center gap-2 bg-secondary cursor-pointer text-secondary-foreground rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary/80 transition">
 					<span>{LANGUAGES.find((l) => l.code === lang)?.flag}</span>
 					<span>{lang.toUpperCase()}</span>
 					<svg

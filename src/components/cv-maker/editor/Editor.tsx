@@ -18,12 +18,14 @@ import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
 import ExportDialog from "./ExportDialog";
 import { Card } from "@/components/ui/card";
+import FontSelector from "./FontSelector";
 
 const TABS: {
 	id: TabId;
 	labelKey: keyof (typeof translations)["en"];
 	icon: React.ElementType;
 }[] = [
+	{ id: "fonts", labelKey: "fonts", icon: UserIcon },
 	{ id: "personal", labelKey: "personal", icon: UserIcon },
 	{ id: "experience", labelKey: "experience", icon: BriefcaseIcon },
 	{ id: "education", labelKey: "education", icon: GraduationCapIcon },
@@ -38,6 +40,8 @@ export default function Editor() {
 
 	const renderTabContent = () => {
 		switch (activeTab) {
+			case "fonts":
+				return <FontSelector />;
 			case "personal":
 				return <PersonalInfoForm />;
 			case "experience":
@@ -49,7 +53,7 @@ export default function Editor() {
 			case "skills":
 				return <SkillsForm />;
 			default:
-				return null;
+				return <PersonalInfoForm />;
 		}
 	};
 

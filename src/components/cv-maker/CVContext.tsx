@@ -28,7 +28,7 @@ const getDefaultFont = (lang: string) => {
 // Initial State
 const getInitialState = (lang: string): CVData => ({
 	personalInfo: {
-		name: "Alex Johnson",
+		name: "Philip J. Fry",
 		title: "Senior Frontend Developer",
 		email: "alex.johnson.dev@example.com",
 		phone: "+1 (555) 987-6543",
