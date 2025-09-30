@@ -1,78 +1,73 @@
 # CV Maker
 
-A web-based CV/Resume builder built with **Next.js**, **TypeScript**, and **Tailwind CSS**.  
-It provides a simple way to create, customize, and export a professional CV directly in the browser.
+![CV Maker preview](https://raw.githubusercontent.com/RamiMizyed/cv-maker/main/public/assets/CVmakerMainImg.png)
 
----
+A browser-side CV / resume builder by **Rami Mizyed**. Build, customize and export professional CVs in English, Arabic (RTL) and Turkish — no server required.
 
 ## Features
 
-- **Live Preview** – Update your CV in real time while editing.
-- **Multi-Language Support** – English, Turkish, and Arabic (with RTL support).
-- **Font Options** – Choose between Google Fonts and locally hosted fonts.
-- **Customizable Sections** – Manage personal info, experience, education, projects, and skills.
-- **PDF Export** – Generate a print-ready PDF version of your CV.
-- **Minimal UI** – Built with [shadcn/ui](https://ui.shadcn.com/) components for a clean design.
+- Live preview while editing
+- Multilingual (en, ar, tr) with RTL support for Arabic
+- Choose Google or local fonts
+- Manage personal info, experience, education, projects and skills
+- Export to print-ready PDF (client-side)
+- Minimal, accessible UI using shadcn/ui + Tailwind
 
----
+## Quickstart
 
-## Getting Started
-
-### 1. Clone & Install
+Clone and install:
 
 ```bash
-git clone https://github.com/yourusername/cvmaker.git
-cd cvmaker
+git clone https://github.com/RamiMizyed/cv-maker.git
+cd cv-maker
 npm install
+# or
+yarn
 ```
 
+Run in development:
+
+```bash
 npm run dev
-
 # or
-
 yarn dev
+```
+
 Open http://localhost:3000
-in your browser.
 
-Tech Stack
+Build for production:
 
-Next.js 14+
-– App Router
+```bash
+npm run build
+npm run start
+# or
+yarn build
+yarn start
+```
 
-TypeScript
-– Static typing
+## Usage
 
-Tailwind CSS
-– Styling
+- Select language (EN / TR / AR)
+- Fill personal info, add experience/education/projects
+- Choose a font and layout options
+- Export as PDF with page format & orientation options
 
-shadcn/ui
-– UI components
+## Deployment
 
-jsPDF
-– PDF export
+Optimized for Vercel. Push to a Git remote and import the repo into Vercel, or:
 
-Project Structure
-src/
-├── app/ # Next.js app router
-├── components/ # Reusable UI components
-│ └── cv-maker/ # CV builder components
-├── lib/ # Helpers (fonts, translations, etc.)
-├── icons/ # Custom icons
-├── types/ # TypeScript types
-└── public/ # Static assets (images, fonts)
+```bash
+vercel --prod
+```
 
-Deployment
+## Contributing
 
-This project is optimized for deployment on Vercel
-:
+PRs, issues and feature requests welcome. Please follow the existing code style (TypeScript + Tailwind + shadcn/ui). For changes to translations or fonts, update files under `src/lib` and add tests where appropriate.
 
-vercel
+## Credits
 
-More details: Next.js Deployment Docs
-.
+Built by Rami Mizyed — https://ramimizyed.dev
 
-License
+## License
 
-MIT ©
-
----
+MIT © Rami Mizyed
