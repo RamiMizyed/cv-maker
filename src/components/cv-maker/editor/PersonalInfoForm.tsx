@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
+import FileUploadCard from "@/components/ui/fileHoverAnimation";
 
 export default function PersonalInfoForm() {
 	const { state, dispatch } = useCV();
@@ -29,19 +30,17 @@ export default function PersonalInfoForm() {
 		});
 	};
 
-	const handlePortraitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files[0]) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				if (typeof reader.result === "string") {
-					dispatch({
-						type: "UPDATE_PERSONAL_INFO",
-						payload: { field: "portrait", value: reader.result },
-					});
-				}
-			};
-			reader.readAsDataURL(e.target.files[0]);
-		}
+	const handlePortraitFile = (file: File) => {
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (typeof reader.result === "string") {
+				dispatch({
+					type: "UPDATE_PERSONAL_INFO",
+					payload: { field: "portrait", value: reader.result },
+				});
+			}
+		};
+		reader.readAsDataURL(file);
 	};
 
 	return (
@@ -123,14 +122,9 @@ export default function PersonalInfoForm() {
 						onChange={handleChange}
 					/>
 				</div>
-				<div>
+				<div className="">
 					<Label htmlFor="portrait">{t.portrait}</Label>
-					<Input
-						id="portrait"
-						type="file"
-						accept="image/*"
-						onChange={handlePortraitChange}
-					/>
+					<FileUploadCard accept="image/*" onFileSelect={handlePortraitFile} />
 				</div>
 			</CardContent>
 		</Card>
