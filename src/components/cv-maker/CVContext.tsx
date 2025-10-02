@@ -50,28 +50,6 @@ const getInitialState = (lang: string): CVData => ({
 				"Architected and migrated a legacy React codebase to Next.js with TypeScript, reducing load times by 35%.\n" +
 				"Collaborated with designers and product managers to deliver accessible, responsive interfaces used by 1M+ users.",
 		},
-		{
-			id: 2,
-			company: "Creative Minds Agency",
-			position: "Frontend Developer",
-			startDate: "Jun 2017",
-			endDate: "Dec 2020",
-			description:
-				"Developed marketing websites and e-commerce stores with custom CMS integrations.\n" +
-				"Built reusable React components and animations that improved engagement and reduced bounce rates.\n" +
-				"Worked directly with clients to translate business requirements into technical solutions.",
-		},
-		{
-			id: 3,
-			company: "Startup Hub",
-			position: "Junior Web Developer",
-			startDate: "Aug 2015",
-			endDate: "May 2017",
-			description:
-				"Supported the development of early-stage SaaS products.\n" +
-				"Wrote modular JavaScript, optimized CSS, and improved SEO performance.\n" +
-				"Learned agile methodologies and collaborated in cross-functional teams.",
-		},
 	],
 	education: [
 		{
@@ -91,24 +69,6 @@ const getInitialState = (lang: string): CVData => ({
 				"Integrated APIs for live CO₂ tracking and renewable energy stats.",
 			link: "github.com/alexjohnson/greentrack",
 			technologies: "React, Next.js, D3.js, TailwindCSS",
-		},
-		{
-			id: 2,
-			name: "DevConnect – Networking Platform",
-			description:
-				"Created a platform for developers to showcase portfolios, post blogs, and connect with peers.\n" +
-				"Implemented authentication, profile customization, and a real-time chat feature.",
-			link: "github.com/alexjohnson/devconnect",
-			technologies: "Next.js, TypeScript, Firebase, Chakra UI",
-		},
-		{
-			id: 3,
-			name: "E-commerce Storefront",
-			description:
-				"Designed and developed a modern, responsive e-commerce storefront with secure checkout.\n" +
-				"Implemented product filtering, reviews, and Stripe integration.",
-			link: "github.com/alexjohnson/ecommerce",
-			technologies: "React, Node.js, Express, PostgreSQL, Stripe API",
 		},
 	],
 	skills:
