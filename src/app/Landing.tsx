@@ -70,7 +70,7 @@ export default function LandingHero() {
 							className={`${poppins.className} text-4xl sm:text-5xl max-w-2xl font-extrabold text-transparent bg-clip-text
 								bg-gradient-to-br
 								from-zinc-900 via-indigo-800 to-pink-500
-								dark:from-zinc-200 dark:via-rose-200 dark:to-pink-900
+								dark:from-zinc-200 dark:via-zinc-100 dark:to-pink-300
 								drop-shadow-sm uppercase`}
 							variants={itemVariants}>
 							{t.landingTitle}
