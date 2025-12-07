@@ -6,7 +6,8 @@ export type TabId =
 	| "experience"
 	| "education"
 	| "skills"
-	| "projects";
+	| "projects"
+	| "assistant";
 
 export interface PersonalInfo {
 	name: string;

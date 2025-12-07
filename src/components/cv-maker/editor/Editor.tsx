@@ -1,4 +1,3 @@
-// components/cv-maker/editor/Editor.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,12 +6,13 @@ import UserIcon from "@/icons/UserIcon";
 import BriefcaseIcon from "@/icons/BriefCaseIcon";
 import GraduationCapIcon from "@/icons/GradCapIcon";
 import WrenchIcon from "@/icons/WrenchIcon";
-import { FolderGit2Icon } from "lucide-react";
+import { FolderGit2Icon, SparklesIcon } from "lucide-react"; // 👈 NEW
 import PersonalInfoForm from "./PersonalInfoForm";
 import ExperienceForm from "./ExperienceForm";
 import EducationForm from "./EducationForm";
 import ProjectsForm from "./ProjectsForm";
 import SkillsForm from "./SkillsForm";
+import JobAssistant from "./JobAssistant"; // 👈 NEW
 import { TabId } from "@/types/cv";
 import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
@@ -52,15 +52,16 @@ export default function Editor() {
 				return <ProjectsForm />;
 			case "skills":
 				return <SkillsForm />;
+
 			default:
 				return <PersonalInfoForm />;
 		}
 	};
 
 	return (
-		<Card className="col-span-1 lg:col-span-2 h-full   ">
-			<div className="flex flex-col  justify-between items-center ">
-				<h1 className="text-2xl font-bold"> Editor</h1>
+		<Card className="col-span-1 lg:col-span-2 h-full">
+			<div className="flex flex-col justify-between items-center">
+				<h1 className="text-2xl font-bold">Editor</h1>
 			</div>
 
 			<div className="sticky top-[6rem]">
@@ -76,9 +77,11 @@ export default function Editor() {
 						</Button>
 					))}
 				</div>
-				<div className="space-y-6 mb-3 overflow-y-scroll max-h-[100svh] ">
+				<div className="space-y-6 mb-3 overflow-y-scroll max-h-[100svh]">
 					{renderTabContent()}
 				</div>
+				<JobAssistant />
+
 				<ExportDialog />
 			</div>
 		</Card>

@@ -50,6 +50,7 @@ const translations = {
 		orientation: "Orientation",
 		fonts: "Fonts",
 		present: "Present",
+		assistant: "AI Job Assistant",
 	},
 	tr: {
 		// Landing Page
@@ -102,6 +103,7 @@ const translations = {
 		orientation: "Yönlendirme",
 		fonts: "Fonts",
 		present: "Present",
+		assistant: "Yapay Zeka İş Asistanı",
 	},
 	ar: {
 		// Landing Page
@@ -155,6 +157,7 @@ const translations = {
 		orientation: "الاتجاه",
 		fonts: "Fonts",
 		present: "Present",
+		assistant: "مساعد الوظائف بالذكاء الاصطناعي",
 	},
 };
 
