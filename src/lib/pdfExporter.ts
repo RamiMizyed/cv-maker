@@ -267,7 +267,7 @@ export const exportToPDF = async ({
 
 		// Box: 5px solid black, 10px radius
 		doc.setDrawColor("#000000");
-		doc.setLineWidth(5);
+		doc.setLineWidth(2);
 		doc.roundedRect(margin, cursorY, contentWidth, boxH, 10, 10, "S");
 
 		// Text inside box
