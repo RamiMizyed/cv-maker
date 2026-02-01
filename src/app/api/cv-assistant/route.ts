@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 					error:
 						"OPENAI_API_KEY is not set on the server. Check your .env.local.",
 				},
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 		if (!jobDescription || !jobDescription.trim()) {
 			return NextResponse.json(
 				{ error: "jobDescription is required" },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 					error: "Model returned invalid JSON",
 					raw,
 				},
-				{ status: 500 }
+				{ status: 500 },
 			);
 		}
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 			{
 				error: error?.message || "Unexpected error generating suggestions",
 			},
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

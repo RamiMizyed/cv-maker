@@ -12,7 +12,7 @@ export default function CVMaker() {
 		<CVProvider>
 			<div
 				id="cvMaker"
-				className="grid grid-cols-1 lg:grid-cols-5 gap-8 min-h-[100svh] container mx-auto py-10 lg:py-20 px-3 lg:px-6 relative overflow-visible">
+				className="grid grid-cols-1 lg:grid-cols-5 gap-8 min-h-[100svh] max-w-[95%]  mx-auto py-10 lg:py-20 px-3 lg:px-6 relative overflow-visible">
 				<Editor />
 				<Preview />
 			</div>

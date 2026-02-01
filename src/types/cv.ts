@@ -7,7 +7,7 @@ export type TabId =
 	| "education"
 	| "skills"
 	| "projects"
-	| "assistant";
+	| "Languages";
 
 export interface PersonalInfo {
 	name: string;
@@ -31,12 +31,12 @@ export interface Project {
 export interface Experience {
 	id: number;
 	company: string;
+	companyUrl?: string; // ✅ NEW
 	position: string;
 	startDate: string;
 	endDate: string;
 	description: string;
 }
-
 export interface Education {
 	id: number;
 	institution: string;

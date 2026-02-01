@@ -25,7 +25,6 @@ const getDefaultFont = (lang: string) => {
 };
 
 // Initial State
-// Initial State
 const getInitialState = (lang: string): CVData => ({
 	personalInfo: {
 		name: "Philip J. Fry",
@@ -42,13 +41,11 @@ const getInitialState = (lang: string): CVData => ({
 		{
 			id: 1,
 			company: "TechWave Solutions",
+			companyUrl: "https://techwave.example.com", // ✅ NEW
 			position: "Senior Frontend Developer",
 			startDate: "Jan 2021",
 			endDate: "Present",
-			description:
-				"Led a team of 5 engineers in developing a design system adopted across 3 company products.\n" +
-				"Architected and migrated a legacy React codebase to Next.js with TypeScript, reducing load times by 35%.\n" +
-				"Collaborated with designers and product managers to deliver accessible, responsive interfaces used by 1M+ users.",
+			description: "...",
 		},
 	],
 	education: [
@@ -101,12 +98,13 @@ type Action =
 	| { type: "ADD_PROJECT" }
 	| { type: "REMOVE_PROJECT"; payload: { id: number } }
 	| { type: "UPDATE_SKILLS"; payload: string }
-	| { type: "SET_FONT"; payload: string };
+	| { type: "SET_FONT"; payload: string }
+	| { type: "SET_ALL"; payload: CVData }; // ✅ NEW (for JSON import)
 
 // Reducer Function
 const cvReducer = (state: CVData, action: Action): CVData => {
 	switch (action.type) {
-		case "UPDATE_PERSONAL_INFO":
+		case "UPDATE_PERSONAL_INFO": {
 			return {
 				...state,
 				personalInfo: {
@@ -114,20 +112,25 @@ const cvReducer = (state: CVData, action: Action): CVData => {
 					[action.payload.field]: action.payload.value,
 				},
 			};
-		case "UPDATE_EXPERIENCE":
+		}
+
+		case "UPDATE_EXPERIENCE": {
 			return {
 				...state,
 				experience: state.experience.map((exp) =>
 					exp.id === action.payload.id
 						? { ...exp, [action.payload.field]: action.payload.value }
-						: exp
+						: exp,
 				),
 			};
-		case "ADD_EXPERIENCE":
+		}
+
+		case "ADD_EXPERIENCE": {
 			const newExpId =
 				state.experience.length > 0
 					? Math.max(...state.experience.map((e) => e.id)) + 1
 					: 1;
+
 			return {
 				...state,
 				experience: [
@@ -135,35 +138,43 @@ const cvReducer = (state: CVData, action: Action): CVData => {
 					{
 						id: newExpId,
 						company: "",
+						companyUrl: "", // ✅ NEW
 						position: "",
 						startDate: "",
 						endDate: "",
 						description: "",
-					},
+					} as Experience,
 				],
 			};
-		case "REMOVE_EXPERIENCE":
+		}
+
+		case "REMOVE_EXPERIENCE": {
 			if (state.experience.length <= 1) return state;
 			return {
 				...state,
 				experience: state.experience.filter(
-					(exp) => exp.id !== action.payload.id
+					(exp) => exp.id !== action.payload.id,
 				),
 			};
-		case "UPDATE_EDUCATION":
+		}
+
+		case "UPDATE_EDUCATION": {
 			return {
 				...state,
 				education: state.education.map((edu) =>
 					edu.id === action.payload.id
 						? { ...edu, [action.payload.field]: action.payload.value }
-						: edu
+						: edu,
 				),
 			};
-		case "ADD_EDUCATION":
+		}
+
+		case "ADD_EDUCATION": {
 			const newEduId =
 				state.education.length > 0
 					? Math.max(...state.education.map((e) => e.id)) + 1
 					: 1;
+
 			return {
 				...state,
 				education: [
@@ -177,28 +188,35 @@ const cvReducer = (state: CVData, action: Action): CVData => {
 					},
 				],
 			};
-		case "REMOVE_EDUCATION":
+		}
+
+		case "REMOVE_EDUCATION": {
 			if (state.education.length <= 1) return state;
 			return {
 				...state,
 				education: state.education.filter(
-					(edu) => edu.id !== action.payload.id
+					(edu) => edu.id !== action.payload.id,
 				),
 			};
-		case "UPDATE_PROJECT":
+		}
+
+		case "UPDATE_PROJECT": {
 			return {
 				...state,
 				projects: state.projects.map((proj) =>
 					proj.id === action.payload.id
 						? { ...proj, [action.payload.field]: action.payload.value }
-						: proj
+						: proj,
 				),
 			};
-		case "ADD_PROJECT":
+		}
+
+		case "ADD_PROJECT": {
 			const newProjId =
 				state.projects.length > 0
 					? Math.max(...state.projects.map((p) => p.id)) + 1
 					: 1;
+
 			return {
 				...state,
 				projects: [
@@ -212,18 +230,31 @@ const cvReducer = (state: CVData, action: Action): CVData => {
 					},
 				],
 			};
-		case "REMOVE_PROJECT":
+		}
+
+		case "REMOVE_PROJECT": {
 			if (state.projects.length <= 1) return state;
 			return {
 				...state,
 				projects: state.projects.filter(
-					(proj) => proj.id !== action.payload.id
+					(proj) => proj.id !== action.payload.id,
 				),
 			};
-		case "UPDATE_SKILLS":
+		}
+
+		case "UPDATE_SKILLS": {
 			return { ...state, skills: action.payload };
-		case "SET_FONT":
+		}
+
+		case "SET_FONT": {
 			return { ...state, selectedFont: action.payload };
+		}
+
+		case "SET_ALL": {
+			// ✅ This makes JSON import work: replace entire CV state
+			return action.payload;
+		}
+
 		default:
 			return state;
 	}
@@ -238,6 +269,7 @@ const CVContext = createContext<
 export const CVProvider = ({ children }: { children: ReactNode }) => {
 	const { lang } = useLang();
 	const initialState = getInitialState(lang);
+
 	const [state, dispatch] = useReducer(cvReducer, initialState);
 
 	return (

@@ -11,22 +11,6 @@ interface ExportOptions {
 	orientation: "portrait" | "landscape";
 }
 
-const getImageDimensions = (
-	dataUrl: string
-): Promise<{ width: number; height: number }> => {
-	return new Promise((resolve, reject) => {
-		const img = new Image();
-		img.onload = () => {
-			resolve({ width: img.width, height: img.height });
-		};
-		img.onerror = (err) => {
-			console.error("Failed to load image for dimension reading.", err);
-			reject(err);
-		};
-		img.src = dataUrl;
-	});
-};
-
 export const exportToPDF = async ({
 	cvData,
 	lang,
@@ -62,6 +46,7 @@ export const exportToPDF = async ({
 	];
 	const fontMap = new Map(allFonts.map((font) => [font.value, font.path]));
 	let activeFont = "helvetica";
+
 	if (
 		selectedFont &&
 		standardFonts[selectedFont as keyof typeof standardFonts]
@@ -77,8 +62,8 @@ export const exportToPDF = async ({
 				const base64Font = btoa(
 					new Uint8Array(fontBuffer).reduce(
 						(data, byte) => data + String.fromCharCode(byte),
-						""
-					)
+						"",
+					),
 				);
 				doc.addFileToVFS(`${selectedFont}.ttf`, base64Font);
 				doc.addFont(`${selectedFont}.ttf`, selectedFont, "normal");
@@ -96,8 +81,8 @@ export const exportToPDF = async ({
 				const base64Font = btoa(
 					new Uint8Array(fontBuffer).reduce(
 						(data, byte) => data + String.fromCharCode(byte),
-						""
-					)
+						"",
+					),
 				);
 				doc.addFileToVFS("Amiri.ttf", base64Font);
 				doc.addFont("Amiri.ttf", "Amiri", "normal");
@@ -107,6 +92,7 @@ export const exportToPDF = async ({
 			}
 		}
 	}
+
 	doc.setFont(activeFont);
 
 	// --- Page Setup and Styling Constants ---
@@ -124,13 +110,13 @@ export const exportToPDF = async ({
 		skillBg: "#ebf8ff",
 	};
 
-	// ✨ SPACING CONTROL PANEL - Spacing between sections increased ✨
 	const SPACING = {
 		sectionTitleBottom: 20,
-		sectionBottom: 35, // INCREASED for better separation
+		sectionBottom: 35,
 		itemGap: 22,
 		headingLine: 15,
 		subheadingBottom: 15,
+		companyToBullets: 10, // ✅ extra breathing room between company line and bullets
 		bulletItem: 8,
 		paragraph: 12,
 		headerBottom: 35,
@@ -182,24 +168,32 @@ export const exportToPDF = async ({
 		return `https://${url}`;
 	};
 
-	// ✨ NEW & IMPROVED: Smart footer function ✨
+	const displayUrl = (url: string) =>
+		url
+			.replace(/^https?:\/\//i, "")
+			.replace(/^www\./i, "")
+			.replace(/\/+$/g, "");
+
+	const truncateToWidth = (text: string, maxWidth: number) => {
+		if (doc.getTextWidth(text) <= maxWidth) return text;
+		let t = text;
+		while (t.length > 3 && doc.getTextWidth(`${t}…`) > maxWidth) {
+			t = t.slice(0, -1);
+		}
+		return `${t}…`;
+	};
+
+	// ✨ Smart footer
 	const addFooter = () => {
 		const footerText =
 			"This CV was made with https://cvmaker.ramimizyed.dev/ - Open Source CV Maker";
 		const footerFontSize = 8;
 		const footerColor = "#718096";
 
-		// 1. Explicitly set the context to the last page
 		doc.setPage(doc.getNumberOfPages());
 
-		// 2. Calculate the desired Y position, a set distance below the last content
-		const desiredY = cursorY + 40; // 40pt below the last piece of content
-
-		// 3. Define the lowest possible position for the footer (near the bottom margin)
+		const desiredY = cursorY + 40;
 		const maxY = pageHeight - 20;
-
-		// 4. Use Math.min to place the footer correctly. It will be at desiredY unless
-		//    that is lower than maxY, preventing it from going off-page.
 		const finalY = Math.min(desiredY, maxY);
 
 		doc.setFontSize(footerFontSize);
@@ -209,44 +203,18 @@ export const exportToPDF = async ({
 	};
 
 	// --- Header Section ---
-	if (personalInfo.portrait) {
-		try {
-			const { width: originalWidth, height: originalHeight } =
-				await getImageDimensions(personalInfo.portrait);
-			const maxImgSize = 75;
-			let imgWidth = maxImgSize;
-			let imgHeight = maxImgSize;
-			const ratio = originalWidth / originalHeight;
-			if (ratio > 1) {
-				imgHeight = maxImgSize / ratio;
-			} else {
-				imgWidth = maxImgSize * ratio;
-			}
-			const imgX = (pageWidth - imgWidth) / 2;
-			checkPageBreak(imgHeight + 40);
-			doc.addImage(
-				personalInfo.portrait,
-				"JPEG",
-				imgX,
-				cursorY,
-				imgWidth,
-				imgHeight
-			);
-			cursorY += imgHeight + 40;
-		} catch (error) {
-			console.error("Failed to add portrait image to PDF:", error);
-		}
-	}
 	doc.setTextColor(COLORS.textDark);
 	doc.setFont(activeFont, "bold");
 	doc.setFontSize(28);
 	doc.text(personalInfo.name, pageWidth / 2, cursorY, { align: "center" });
 	cursorY += doc.getTextDimensions(personalInfo.name).h - 8;
+
 	doc.setFont(activeFont, "normal");
 	doc.setFontSize(16);
 	doc.setTextColor(COLORS.textLight);
 	doc.text(personalInfo.title, pageWidth / 2, cursorY, { align: "center" });
 	cursorY += doc.getTextDimensions(personalInfo.title).h + 15;
+
 	doc.setFontSize(9);
 	const contactInfo = [
 		{ text: personalInfo.email, link: `mailto:${personalInfo.email}` },
@@ -257,58 +225,92 @@ export const exportToPDF = async ({
 		},
 		{ text: personalInfo.github, link: ensureAbsoluteUrl(personalInfo.github) },
 	].filter((item) => item.text && item.text.trim() !== "");
+
 	const separator = "   •   ";
 	const fullText = contactInfo.map((c) => c.text).join(separator);
 	const textWidth = doc.getTextWidth(fullText);
 	let currentX = (pageWidth - textWidth) / 2;
+
 	contactInfo.forEach((item, index) => {
 		if (!item.text) return;
 		const itemWidth = doc.getTextWidth(item.text);
 		doc.setTextColor(COLORS.primary);
 		doc.textWithLink(item.text, currentX, cursorY, { url: item.link });
 		currentX += itemWidth;
+
 		if (index < contactInfo.length - 1) {
 			doc.setTextColor(COLORS.textLight);
 			doc.text(separator, currentX, cursorY);
 			currentX += doc.getTextWidth(separator);
 		}
 	});
+
 	cursorY += SPACING.headerBottom;
 
-	// --- Summary Section ---
+	// --- Summary Section (boxed) ---
 	if (personalInfo.summary) {
 		addSectionTitle(t.summary);
+
 		doc.setFont(activeFont, "normal");
 		doc.setFontSize(10);
 		doc.setTextColor(COLORS.textLight);
+
+		const padding = 12;
 		const splitSummary = doc.splitTextToSize(
 			personalInfo.summary,
-			contentWidth
+			contentWidth - padding * 2,
 		);
-		doc.text(splitSummary, margin, cursorY);
-		cursorY += doc.getTextDimensions(splitSummary).h + SPACING.sectionBottom;
+		const summaryTextHeight = doc.getTextDimensions(splitSummary).h;
+		const boxH = summaryTextHeight + padding * 2;
+
+		checkPageBreak(boxH + SPACING.sectionBottom);
+
+		// Box: 5px solid black, 10px radius
+		doc.setDrawColor("#000000");
+		doc.setLineWidth(5);
+		doc.roundedRect(margin, cursorY, contentWidth, boxH, 10, 10, "S");
+
+		// Text inside box
+		doc.setTextColor(COLORS.textLight);
+		doc.setFont(activeFont, "normal");
+		doc.text(splitSummary, margin + padding, cursorY + padding + 10);
+
+		cursorY += boxH + SPACING.sectionBottom;
+
+		// Restore defaults
+		doc.setLineWidth(1);
+		doc.setDrawColor(COLORS.line);
+		doc.setTextColor(COLORS.textDark);
 	}
 
-	// --- Experience Section ---
+	// --- Experience Section (company link + URL on right + extra spacing) ---
 	if (experience && experience.length > 0) {
 		addSectionTitle(t.experience);
+
 		experience.forEach((job: Experience, index) => {
-			const headingHeight = 30;
+			// Estimate space needed (position line + dates line + company line + spacing + bullets)
+			const headingHeight =
+				SPACING.headingLine * 2 + SPACING.companyToBullets + 6;
+
 			let descriptionHeight = 0;
 			if (job.description) {
 				const splitLines = doc.splitTextToSize(
 					job.description,
-					contentWidth - 15
+					contentWidth - 15,
 				);
 				descriptionHeight = doc.getTextDimensions(splitLines).h;
 			}
+
 			if (checkPageBreak(headingHeight + descriptionHeight)) {
 				addSectionTitle(t.experience);
 			}
+
+			// Position + dates
 			doc.setFont(activeFont, "bold");
 			doc.setFontSize(11);
 			doc.setTextColor(COLORS.textDark);
 			doc.text(job.position, margin, cursorY);
+
 			doc.setFont(activeFont, "normal");
 			doc.setTextColor(COLORS.textLight);
 			const endDateText = job.endDate || t.present || "Present";
@@ -316,17 +318,57 @@ export const exportToPDF = async ({
 				`${job.startDate} - ${endDateText}`,
 				contentWidth + margin,
 				cursorY,
-				{ align: "right" }
+				{
+					align: "right",
+				},
 			);
+
 			cursorY += SPACING.headingLine;
+
+			// Company line (left company name as link + right URL like Projects)
 			doc.setFont(activeFont, "italic");
 			doc.setFontSize(10);
 			doc.setTextColor(COLORS.primary);
-			doc.text(job.company, margin, cursorY);
-			cursorY += SPACING.headingLine;
+
+			const companyUrlAbs = ensureAbsoluteUrl((job as any).companyUrl);
+			const companyUrlText = companyUrlAbs ? displayUrl(companyUrlAbs) : "";
+
+			// Prevent overlap: reserve width for URL on the right if present
+			const rightWidth = companyUrlText ? doc.getTextWidth(companyUrlText) : 0;
+			const leftMaxWidth = companyUrlText
+				? contentWidth - rightWidth - 12
+				: contentWidth;
+
+			const companyText = truncateToWidth(job.company, leftMaxWidth);
+
+			if (companyUrlAbs) {
+				// left: company name clickable
+				doc.textWithLink(companyText, margin, cursorY, { url: companyUrlAbs });
+
+				// right: URL clickable (like projects)
+				const linkWidth = doc.getTextWidth(companyUrlText);
+				doc.setFontSize(9); // match your project link style
+				doc.textWithLink(
+					companyUrlText,
+					contentWidth + margin - linkWidth,
+					cursorY,
+					{
+						url: companyUrlAbs,
+					},
+				);
+				doc.setFontSize(10); // restore for consistency
+			} else {
+				doc.text(companyText, margin, cursorY);
+			}
+
+			// ✅ more space before bullets
+			cursorY += SPACING.headingLine + SPACING.companyToBullets;
+
+			// Bullets
 			if (job.description) {
 				addBulletedList(job.description);
 			}
+
 			if (index < experience.length - 1) {
 				cursorY += SPACING.itemGap;
 			} else {
@@ -338,12 +380,15 @@ export const exportToPDF = async ({
 	// --- Projects Section ---
 	if (projects && projects.length > 0) {
 		addSectionTitle(t.projects);
+
 		projects.forEach((proj: Project, index) => {
 			checkPageBreak(60);
+
 			doc.setFont(activeFont, "bold");
 			doc.setFontSize(11);
 			doc.setTextColor(COLORS.textDark);
 			doc.text(proj.name, margin, cursorY);
+
 			if (proj.link) {
 				const linkText = proj.link.replace(/^(https?:\/\/)?(www\.)?/, "");
 				const linkWidth = doc.getTextWidth(linkText);
@@ -353,15 +398,20 @@ export const exportToPDF = async ({
 					url: ensureAbsoluteUrl(proj.link),
 				});
 			}
+
 			cursorY += SPACING.headingLine;
+
 			doc.setFont(activeFont, "italic");
 			doc.setFontSize(10);
 			doc.setTextColor(COLORS.primary);
 			doc.text(proj.technologies, margin, cursorY);
+
 			cursorY += SPACING.subheadingBottom;
+
 			if (proj.description) {
 				addBulletedList(proj.description);
 			}
+
 			if (index < projects.length - 1) {
 				cursorY += SPACING.itemGap;
 			} else {
@@ -373,60 +423,78 @@ export const exportToPDF = async ({
 	// --- Education Section ---
 	if (education && education.length > 0) {
 		addSectionTitle(t.education);
+
 		education.forEach((edu: Education) => {
 			checkPageBreak(40);
+
 			doc.setFont(activeFont, "bold");
 			doc.setFontSize(11);
 			doc.setTextColor(COLORS.textDark);
 			doc.text(edu.degree, margin, cursorY);
+
 			doc.setFont(activeFont, "normal");
 			doc.setTextColor(COLORS.textLight);
 			doc.text(
 				`${edu.startDate} - ${edu.endDate}`,
 				contentWidth + margin,
 				cursorY,
-				{ align: "right" }
+				{
+					align: "right",
+				},
 			);
+
 			cursorY += SPACING.headingLine;
+
 			doc.setFont(activeFont, "normal");
 			doc.setFontSize(10);
 			doc.setTextColor(COLORS.primary);
 			doc.text(edu.institution, margin, cursorY);
-			cursorY += SPACING.sectionBottom; // This now uses the larger value
+
+			cursorY += SPACING.sectionBottom;
 		});
 	}
 
 	// --- Skills Section ---
 	if (skills) {
 		addSectionTitle(t.skills);
+
 		doc.setFont(activeFont, "normal");
 		doc.setFontSize(9);
+
 		const skillPills = skills
 			.split(",")
 			.map((s) => s.trim())
 			.filter((s) => s);
+
 		const pillPaddingX = 10;
 		const pillPaddingY = 5;
 		const pillHeight = doc.getTextDimensions("T").h + pillPaddingY * 2;
 		const pillGap = 8;
+
 		let currentX = margin;
 		checkPageBreak(pillHeight + pillGap);
+
 		skillPills.forEach((skill: string) => {
 			const textWidth = doc.getTextWidth(skill);
 			const pillWidth = textWidth + pillPaddingX * 2;
+
 			if (currentX + pillWidth > pageWidth - margin) {
 				cursorY += pillHeight + pillGap;
 				currentX = margin;
 				checkPageBreak(pillHeight + pillGap);
 			}
+
 			doc.setFillColor(COLORS.skillBg);
 			doc.roundedRect(currentX, cursorY, pillWidth, pillHeight, 5, 5, "F");
+
 			doc.setTextColor(COLORS.primary);
 			doc.text(skill, currentX + pillPaddingX, cursorY + pillHeight / 2, {
 				baseline: "middle",
 			});
+
 			currentX += pillWidth + pillGap;
 		});
+
 		cursorY += pillHeight + 20;
 	}
 

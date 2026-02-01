@@ -18,7 +18,7 @@ export default function ExperienceForm() {
 
 	const handleChange = (
 		id: number,
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 	) => {
 		dispatch({
 			type: "UPDATE_EXPERIENCE",
@@ -63,6 +63,16 @@ export default function ExperienceForm() {
 									id={`company-${exp.id}`}
 									name="company"
 									value={exp.company}
+									onChange={(e) => handleChange(exp.id, e)}
+								/>
+							</div>
+							<div>
+								<Label htmlFor={`companyUrl-${exp.id}`}>Company Website</Label>
+								<Input
+									id={`companyUrl-${exp.id}`}
+									name="companyUrl"
+									placeholder="https://company.com"
+									value={(exp as any).companyUrl || ""}
 									onChange={(e) => handleChange(exp.id, e)}
 								/>
 							</div>

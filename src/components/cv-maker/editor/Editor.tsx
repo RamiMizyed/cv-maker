@@ -19,6 +19,7 @@ import translations from "@/lib/translations";
 import ExportDialog from "./ExportDialog";
 import { Card } from "@/components/ui/card";
 import FontSelector from "./FontSelector";
+import JsonIO from "./JsonIO";
 
 const TABS: {
 	id: TabId;
@@ -81,7 +82,7 @@ export default function Editor() {
 					{renderTabContent()}
 				</div>
 				<JobAssistant />
-
+				<JsonIO />
 				<ExportDialog />
 			</div>
 		</Card>
