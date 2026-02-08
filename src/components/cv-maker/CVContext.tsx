@@ -28,9 +28,9 @@ const getDefaultFont = (lang: string) => {
 const getInitialState = (lang: string): CVData => ({
 	personalInfo: {
 		name: "Rami Mizyed",
-		title: "Full-stack developer",
+		title: "Full-stack developer | Content Creator & Client Success Manager",
 		email: "me@ramimizyed.dev",
-		phone: "+1 (555) 987-6543",
+		phone: "+90 (553) 841-8269",
 		website: "ramimizyed.dev",
 		github: "github.com/ramimizyed",
 		summary:

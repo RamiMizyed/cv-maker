@@ -104,7 +104,7 @@ export const exportToPDF = async ({
 
 	const COLORS = {
 		textDark: "#1a202c",
-		textLight: "#4a5568",
+		textLight: "##111111",
 		primary: "#2b6cb0",
 		line: "#e2e8f0",
 		skillBg: "#ebf8ff",
@@ -267,7 +267,7 @@ export const exportToPDF = async ({
 
 		// Box: 5px solid black, 10px radius
 		doc.setDrawColor("#000000");
-		doc.setLineWidth(2);
+		doc.setLineWidth(1);
 		doc.roundedRect(margin, cursorY, contentWidth, boxH, 10, 10, "S");
 
 		// Text inside box
