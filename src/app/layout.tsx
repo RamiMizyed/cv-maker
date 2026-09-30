@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
 
 // ✅ Fix: set metadataBase so OG/Twitter images resolve properly
 export const metadata: Metadata = {
-	metadataBase: new URL("https://ramimizyed.dev"),
-	title: "CV Maker - Client Side CV Builder",
+	metadataBase: new URL("https://cvmaker.ramimizyed.dev"),
+	title: "CV Maker: Free AI CV Builder",
 	description:
-		"Browser-side CV builder by Rami Mizyed. Create professional CVs with multilingual support (English, Arabic, Turkish).",
+		"Free CV builder with four templates, AI job tailoring, a CV check and PDF export. English, Turkish and Arabic. No sign-up; your data stays in your browser.",
 	applicationName: "CV Maker",
 	keywords: [
 		"CV",
@@ -30,6 +30,9 @@ export const metadata: Metadata = {
 		"resume builder",
 		"Rami Mizyed",
 		"multilingual",
+		"ATS",
+		"cover letter",
+		"AI resume",
 		"Arabic",
 		"Turkish",
 		"English",
@@ -39,10 +42,10 @@ export const metadata: Metadata = {
 	publisher: "Rami Mizyed",
 	robots: { index: true, follow: true },
 	openGraph: {
-		title: "CV Maker — Rami Mizyed",
+		title: "CV Maker by Rami Mizyed",
 		description:
-			"Create professional CVs in English, Arabic and Turkish — all in the browser.",
-		url: "https://ramimizyed.dev/cv-maker",
+			"Build, tailor and export a job-ready CV in English, Arabic or Turkish, right in your browser.",
+		url: "https://cvmaker.ramimizyed.dev",
 		siteName: "CV Maker",
 		images: [
 			{
@@ -57,9 +60,9 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "CV Maker — Rami Mizyed",
+		title: "CV Maker by Rami Mizyed",
 		description:
-			"Create professional CVs in English, Arabic and Turkish — all in the browser.",
+			"Build, tailor and export a job-ready CV in English, Arabic or Turkish, right in your browser.",
 		creator: "@RamiMizyed",
 		images: ["/assets/CVmakerMainImg.png"],
 	},

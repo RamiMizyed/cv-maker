@@ -1,98 +1,27 @@
-// Note: I've updated "Source Sans Pro" to "Source Sans 3" to match your downloaded file.
-const GOOGLE_FONTS = {
-	english: [
-		{
-			label: "Roboto",
-			value: "Roboto",
-			path: "/fonts/Roboto-VariableFont_wdth,wght.ttf",
-		},
-		{
-			label: "Open Sans",
-			value: "Open Sans",
-			path: "/fonts/OpenSans-VariableFont_wdth,wght.ttf",
-		},
-		{
-			label: "Lato",
-			value: "Lato",
-			path: "/fonts/Lato-Regular.ttf",
-		},
-		{
-			label: "Montserrat",
-			value: "Montserrat",
-			path: "/fonts/Montserrat-VariableFont_wght.ttf",
-		},
-		{
-			label: "Oswald",
-			value: "Oswald",
-			path: "/fonts/Oswald-VariableFont_wght.ttf",
-		},
-		{
-			label: "Source Sans 3",
-			value: "Source Sans 3",
-			path: "/fonts/SourceSans3-VariableFont_wght.ttf",
-		},
-		{
-			label: "Merriweather",
-			value: "Merriweather",
-			path: "/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf",
-		},
-		{
-			label: "PT Sans",
-			value: "PT Sans",
-			path: "/fonts/PTSans-Regular.ttf",
-		},
-		{
-			label: "Ubuntu",
-			value: "Ubuntu",
-			path: "/fonts/Ubuntu-Regular.ttf",
-		},
+// Fonts bundled in /public/fonts and declared with @font-face in globals.css.
+
+export type FontOption = { label: string; value: string; arabic?: boolean };
+
+export const FONTS: { latin: FontOption[]; arabic: FontOption[] } = {
+	latin: [
+		{ label: "Roboto", value: "Roboto" },
+		{ label: "Open Sans", value: "Open Sans" },
+		{ label: "Lato", value: "Lato" },
+		{ label: "Montserrat", value: "Montserrat" },
+		{ label: "Source Sans 3", value: "Source Sans 3" },
+		{ label: "PT Sans", value: "PT Sans" },
+		{ label: "Ubuntu", value: "Ubuntu" },
+		{ label: "Merriweather", value: "Merriweather" },
+		{ label: "Oswald", value: "Oswald" },
 	],
 	arabic: [
-		{ label: "Amiri", value: "Amiri", path: "/fonts/Amiri-Regular.ttf" },
-		{ label: "Cairo", value: "Cairo", path: "/fonts/Cairo-Regular.ttf" },
-		{
-			label: "Almarai",
-			value: "Almarai",
-			path: "/fonts/Almarai-Regular.ttf",
-		},
-		{
-			label: "Tajawal",
-			value: "Tajawal",
-			path: "/fonts/Tajawal-Regular.ttf",
-		},
-		{
-			label: "Lalezar",
-			value: "Lalezar",
-			path: "/fonts/Lalezar-Regular.ttf",
-		},
-		{
-			label: "Scheherazade New",
-			value: "Scheherazade New",
-			path: "/fonts/ScheherazadeNew-Regular.ttf",
-		},
-	],
-	turkish: [
-		{
-			label: "Roboto",
-			value: "Roboto",
-			path: "/fonts/Roboto-VariableFont_wdth,wght.ttf",
-		},
-		{
-			label: "Lato",
-			value: "Lato",
-			path: "/fonts/Lato-Regular.ttf",
-		},
-		{
-			label: "Open Sans",
-			value: "Open Sans",
-			path: "/fonts/OpenSans-VariableFont_wdth,wght.ttf",
-		},
-		{
-			label: "Montserrat",
-			value: "Montserrat",
-			path: "/fonts/Montserrat-VariableFont_wght.ttf",
-		},
+		{ label: "Cairo", value: "Cairo", arabic: true },
+		{ label: "Tajawal", value: "Tajawal", arabic: true },
+		{ label: "Almarai", value: "Almarai", arabic: true },
+		{ label: "Amiri", value: "Amiri", arabic: true },
+		{ label: "Scheherazade New", value: "Scheherazade New", arabic: true },
+		{ label: "Lalezar", value: "Lalezar", arabic: true },
 	],
 };
 
-export default GOOGLE_FONTS;
+export const isArabicFont = (font: string) => FONTS.arabic.some((f) => f.value === font);
