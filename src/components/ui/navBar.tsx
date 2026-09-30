@@ -115,7 +115,7 @@ const NavBar = () => {
 						<span className=" text-sm ">
 							{starCount !== null
 								? new Intl.NumberFormat().format(starCount)
-								: "—"}
+								: ""}
 						</span>
 					</Button>
 				</div>

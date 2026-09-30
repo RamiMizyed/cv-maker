@@ -1,362 +1,313 @@
 // components/cv-maker/CVContext.tsx
 "use client";
 
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import React, {
+	createContext,
+	ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useReducer,
+	useRef,
+	useState,
+} from "react";
 import {
 	CVData,
+	CVSettings,
+	ListItem,
+	ListSectionKey,
 	PersonalInfo,
-	Experience,
-	Education,
-	Project,
+	SectionConfig,
+	SectionId,
 } from "@/types/cv";
-import GOOGLE_FONTS from "@/lib/fontList";
-import { useLang } from "@/lib/lang";
+import { emptyItem, sampleCV } from "@/lib/cv/defaults";
+import { normalizeCV } from "@/lib/cv/migrate";
 
-// Helper to get default font based on language
-const getDefaultFont = (lang: string) => {
-	switch (lang) {
-		case "ar":
-			return GOOGLE_FONTS.arabic[0].value;
-		case "tr":
-			return GOOGLE_FONTS.turkish[0].value;
-		default:
-			return GOOGLE_FONTS.english[0].value;
-	}
+const STORAGE_KEY = "cvmaker:v2";
+const HISTORY_LIMIT = 100;
+/** Edits to the same field within this window collapse into one undo step. */
+const COALESCE_MS = 800;
+
+export type Action =
+	| { type: "SET_PERSONAL"; field: keyof PersonalInfo; value: string }
+	| {
+			type: "UPDATE_ITEM";
+			section: ListSectionKey;
+			id: string;
+			patch: Record<string, string>;
+	  }
+	| { type: "ADD_ITEM"; section: ListSectionKey }
+	| { type: "REMOVE_ITEM"; section: ListSectionKey; id: string }
+	| { type: "MOVE_ITEM"; section: ListSectionKey; from: number; to: number }
+	| { type: "SET_SKILLS"; skills: string[] }
+	| { type: "UPDATE_SETTINGS"; patch: Partial<CVSettings> }
+	| { type: "UPDATE_SECTION"; id: SectionId; patch: Partial<SectionConfig> }
+	| { type: "MOVE_SECTION"; from: number; to: number }
+	| { type: "REPLACE"; cv: CVData };
+
+const move = <T,>(list: T[], from: number, to: number): T[] => {
+	if (from === to || from < 0 || to < 0 || from >= list.length || to >= list.length)
+		return list;
+	const next = list.slice();
+	const [item] = next.splice(from, 1);
+	next.splice(to, 0, item);
+	return next;
 };
 
-// Initial State
-const getInitialState = (lang: string): CVData => ({
-	personalInfo: {
-		name: "Rami Mizyed",
-		title: "Full-stack developer | Content Creator & Client Success Manager",
-		email: "me@ramimizyed.dev",
-		phone: "+90 (553) 841-8269",
-		website: "ramimizyed.dev",
-		github: "github.com/ramimizyed",
-		summary:
-			"Full-stack developer (React/Next.js/Node) with 5 years building and scaling production web apps end-to-end (UI, APIs, DB, cloud). Led teams, rebuilt legacy systems, and automated workflows with Python + Zapier/n8n. Strong in design, performance, accessibility (WCAG), and shipping products that reduce ops work and improve UX. Trilingual: EN/AR/TR.",
-		portrait: "/assets/Cat_01.png",
-	},
-	experience: [
-		{
-			id: 1,
-			company: "Global Campus of Human Rights",
-			companyUrl: "https://globalcampusalumni.org/",
-			position: "Lead Web Developer",
-			startDate: "2024",
-			endDate: "Present",
-			description:
-				"Built Alumni Portal from 01 using Next.js/React + Node + (DB), shipping core features (auth, profiles, search, admin tools).\n" +
-				"Optimized the platform for SEO to increase organic reach while maintaining rigorous security protocols and database integrity for sensitive alumni data.\n" +
-				"Implemented mobile-first responsive design and adhered to WCAG accessibility standards, ensuring the platform is inclusive and performant across all devices.",
-		},
-		{
-			id: 2,
-			company: "Cascade Clarity AI",
-			companyUrl: "https://cascadeclarity.ai/",
-			position: "AI Automation Engineer",
-			startDate: "2023",
-			endDate: "2024",
-			description:
-				"Designed enterprise-grade automation architectures using n8n and Zapier, integrating disparate business tools to remove data silos.\n" +
-				"Developed custom Python scripts to connect LLMs with client databases, automating complex text analysis and reporting tasks.\n" +
-				"Delivered solutions that reduced client administrative workload by automating manual data entry and lead qualification processes.",
-		},
-		{
-			id: 3,
-			company: "Salesmrkt",
-			companyUrl: "https://salesmrkt.com/",
-			position: "Technical Lead & Client Success Manager",
-			startDate: "2021",
-			endDate: "2023",
-			description:
-				"Spearheaded the complete re-engineering of the legacy platform using React.js and Node.js. Migrated database infrastructure to MongoDB, significantly improving query speeds and platform responsiveness.\n" +
-				"Served as the primary technical liaison for investors and key accounts, translating technical roadmaps into business value and securing stakeholder buy-in.\n" +
-				"Worked directly in Figma with design teams to ensure technical feasibility of high-fidelity prototypes before implementation.",
-		},
-		{
-			id: 4,
-			company: "BlueClip (Partnered with JellySmack)",
-			companyUrl: "https://jellysmack.com/",
-			position: "Multimedia Content Specialist",
-			startDate: "2018",
-			endDate: "2020",
-			description:
-				"Produced and edited high-performing content for Fashion and Wellness verticals using Adobe Creative Suite (Premiere, After Effects).\n" +
-				"Leveraged technical understanding of algorithms to optimize content for social platforms, driving consistent engagement growth.",
-		},
-	],
-	projects: [
-		{
-			id: 1,
-			name: "Green Awareness - Carbon Output",
-			link: "https://greenawareness.org/",
-			technologies: "React, Next.js, D3.js, TailwindCSS",
-			description:
-				"Developed an interactive dashboard visualizing environmental data with charts and 3D models.\n" +
-				"Integrated APIs for live CO₂ tracking and renewable energy stats.",
-		},
-		{
-			id: 2,
-			name: "CV Maker",
-			link: "https://cvmaker.ramimizyed.dev/",
-			technologies: "TailwindCSS, NodeJS, NextJS",
-			description: "Made this CV with this lol — AI Powered CV maker.",
-		},
-		{
-			id: 3,
-			name: "EZ Survey Pro",
-			link: "https://ezsurveypro.com/",
-			technologies: "NodeJS, Next.js, TailwindCSS",
-			description:
-				"Survey platform with clean UX for fast, frictionless responses.",
-		},
-		{
-			id: 4,
-			name: "BTS Studios",
-			link: "https://btsstudios.com/",
-			technologies: "GSAP + Framer Motion, TailwindCSS",
-			description:
-				"Agency website rebuilt with performance and elegance in mind.",
-		},
-		{
-			id: 5,
-			name: "Democracy-101",
-			link: "https://www.democracy-101.org/",
-			technologies: "Full Stack",
-			description: "Democracy 101 feed-native civic education",
-		},
-	],
-	education: [
-		{
-			id: 1,
-			institution: "Ankara University",
-			degree: "Bachelor of Science in Computer Science (Graduated with Honors)",
-			startDate: "Aug 2017",
-			endDate: "May 2021",
-		},
-		{
-			id: 2,
-			institution: "U.S. Department of State",
-			degree: "Kennedy-Lugar Youth Exchange & Study (YES) Scholarship",
-			startDate: "2013",
-			endDate: "2015",
-		},
-	],
-	skills:
-		"React.js, Next.js, TypeScript, JavaScript (ES6+), TailwindCSS, GSAP, Framer Motion, Redux, Zustand, Three.js, Node.js, Express.js, PostgreSQL, Prisma, Python, .NET, REST APIs, GraphQL, Docker, AWS, EC2, S3, Lambda, GitHub Actions, CI/CD, Nginx, UI/UX Design, Design Systems, Figma, WCAG Accessibility, Responsive Design, Agile, Scrum, SEO Optimization, Performance Tuning, AI, API Integration, OpenAI, LangChain",
-	selectedFont: getDefaultFont(lang),
-});
+type AnyItem = ListItem<ListSectionKey>;
 
-// Reducer Actions
-type Action =
-	| {
-			type: "UPDATE_PERSONAL_INFO";
-			payload: { field: keyof PersonalInfo; value: string };
-	  }
-	| {
-			type: "UPDATE_EXPERIENCE";
-			payload: { id: number; field: keyof Experience; value: string };
-	  }
-	| { type: "ADD_EXPERIENCE" }
-	| { type: "REMOVE_EXPERIENCE"; payload: { id: number } }
-	| {
-			type: "UPDATE_EDUCATION";
-			payload: { id: number; field: keyof Education; value: string };
-	  }
-	| { type: "ADD_EDUCATION" }
-	| { type: "REMOVE_EDUCATION"; payload: { id: number } }
-	| {
-			type: "UPDATE_PROJECT";
-			payload: { id: number; field: keyof Project; value: string };
-	  }
-	| { type: "ADD_PROJECT" }
-	| { type: "REMOVE_PROJECT"; payload: { id: number } }
-	| { type: "UPDATE_SKILLS"; payload: string }
-	| { type: "SET_FONT"; payload: string }
-	| { type: "SET_ALL"; payload: CVData };
-
-// Reducer Function
-const cvReducer = (state: CVData, action: Action): CVData => {
+function cvReducer(state: CVData, action: Action): CVData {
 	switch (action.type) {
-		case "UPDATE_PERSONAL_INFO": {
+		case "SET_PERSONAL":
 			return {
 				...state,
-				personalInfo: {
-					...state.personalInfo,
-					[action.payload.field]: action.payload.value,
+				personalInfo: { ...state.personalInfo, [action.field]: action.value },
+			};
+		case "UPDATE_ITEM":
+			return {
+				...state,
+				[action.section]: (state[action.section] as AnyItem[]).map((item) =>
+					item.id === action.id ? { ...item, ...action.patch } : item,
+				),
+			};
+		case "ADD_ITEM":
+			return {
+				...state,
+				[action.section]: [...state[action.section], emptyItem(action.section)],
+			};
+		case "REMOVE_ITEM":
+			return {
+				...state,
+				[action.section]: (state[action.section] as AnyItem[]).filter(
+					(item) => item.id !== action.id,
+				),
+			};
+		case "MOVE_ITEM":
+			return {
+				...state,
+				[action.section]: move(
+					state[action.section] as AnyItem[],
+					action.from,
+					action.to,
+				),
+			};
+		case "SET_SKILLS":
+			return { ...state, skills: action.skills };
+		case "UPDATE_SETTINGS":
+			return { ...state, settings: { ...state.settings, ...action.patch } };
+		case "UPDATE_SECTION":
+			return {
+				...state,
+				settings: {
+					...state.settings,
+					sections: state.settings.sections.map((s) =>
+						s.id === action.id ? { ...s, ...action.patch } : s,
+					),
 				},
 			};
-		}
-
-		case "UPDATE_EXPERIENCE": {
+		case "MOVE_SECTION":
 			return {
 				...state,
-				experience: state.experience.map((exp) =>
-					exp.id === action.payload.id
-						? { ...exp, [action.payload.field]: action.payload.value }
-						: exp,
-				),
+				settings: {
+					...state.settings,
+					sections: move(state.settings.sections, action.from, action.to),
+				},
 			};
-		}
-
-		case "ADD_EXPERIENCE": {
-			const newExpId =
-				state.experience.length > 0
-					? Math.max(...state.experience.map((e) => e.id)) + 1
-					: 1;
-
-			return {
-				...state,
-				experience: [
-					...state.experience,
-					{
-						id: newExpId,
-						company: "",
-						companyUrl: "",
-						position: "",
-						startDate: "",
-						endDate: "",
-						description: "",
-					} as Experience,
-				],
-			};
-		}
-
-		case "REMOVE_EXPERIENCE": {
-			if (state.experience.length <= 1) return state;
-			return {
-				...state,
-				experience: state.experience.filter(
-					(exp) => exp.id !== action.payload.id,
-				),
-			};
-		}
-
-		case "UPDATE_EDUCATION": {
-			return {
-				...state,
-				education: state.education.map((edu) =>
-					edu.id === action.payload.id
-						? { ...edu, [action.payload.field]: action.payload.value }
-						: edu,
-				),
-			};
-		}
-
-		case "ADD_EDUCATION": {
-			const newEduId =
-				state.education.length > 0
-					? Math.max(...state.education.map((e) => e.id)) + 1
-					: 1;
-
-			return {
-				...state,
-				education: [
-					...state.education,
-					{
-						id: newEduId,
-						institution: "",
-						degree: "",
-						startDate: "",
-						endDate: "",
-					},
-				],
-			};
-		}
-
-		case "REMOVE_EDUCATION": {
-			if (state.education.length <= 1) return state;
-			return {
-				...state,
-				education: state.education.filter(
-					(edu) => edu.id !== action.payload.id,
-				),
-			};
-		}
-
-		case "UPDATE_PROJECT": {
-			return {
-				...state,
-				projects: state.projects.map((proj) =>
-					proj.id === action.payload.id
-						? { ...proj, [action.payload.field]: action.payload.value }
-						: proj,
-				),
-			};
-		}
-
-		case "ADD_PROJECT": {
-			const newProjId =
-				state.projects.length > 0
-					? Math.max(...state.projects.map((p) => p.id)) + 1
-					: 1;
-
-			return {
-				...state,
-				projects: [
-					...state.projects,
-					{
-						id: newProjId,
-						name: "",
-						description: "",
-						link: "",
-						technologies: "",
-					},
-				],
-			};
-		}
-
-		case "REMOVE_PROJECT": {
-			if (state.projects.length <= 1) return state;
-			return {
-				...state,
-				projects: state.projects.filter(
-					(proj) => proj.id !== action.payload.id,
-				),
-			};
-		}
-
-		case "UPDATE_SKILLS": {
-			return { ...state, skills: action.payload };
-		}
-
-		case "SET_FONT": {
-			return { ...state, selectedFont: action.payload };
-		}
-
-		case "SET_ALL": {
-			return action.payload;
-		}
-
+		case "REPLACE":
+			return action.cv;
 		default:
 			return state;
 	}
+}
+
+// ---------------- History ----------------
+
+interface History {
+	past: CVData[];
+	present: CVData;
+	future: CVData[];
+	lastKey: string | null;
+	lastTime: number;
+}
+
+type HistoryAction =
+	| { type: "DO"; action: Action; time: number }
+	| { type: "UNDO" }
+	| { type: "REDO" }
+	/** Load without creating an undo step (initial hydration). */
+	| { type: "HYDRATE"; cv: CVData };
+
+/** Typing into one field produces one key, so a burst of keystrokes undoes as one step. */
+const coalesceKey = (a: Action): string | null => {
+	switch (a.type) {
+		case "SET_PERSONAL":
+			return `p:${a.field}`;
+		case "UPDATE_ITEM":
+			return `i:${a.section}:${a.id}:${Object.keys(a.patch).join(",")}`;
+		case "SET_SKILLS":
+			return "skills";
+		case "UPDATE_SETTINGS":
+			return `s:${Object.keys(a.patch).join(",")}`;
+		case "UPDATE_SECTION":
+			return `sec:${a.id}:${Object.keys(a.patch).join(",")}`;
+		default:
+			return null;
+	}
 };
 
-// Context
-const CVContext = createContext<
-	{ state: CVData; dispatch: React.Dispatch<Action> } | undefined
->(undefined);
+function historyReducer(h: History, a: HistoryAction): History {
+	switch (a.type) {
+		case "HYDRATE":
+			return { past: [], present: a.cv, future: [], lastKey: null, lastTime: 0 };
+		case "UNDO": {
+			if (!h.past.length) return h;
+			return {
+				past: h.past.slice(0, -1),
+				present: h.past[h.past.length - 1],
+				future: [h.present, ...h.future],
+				lastKey: null,
+				lastTime: 0,
+			};
+		}
+		case "REDO": {
+			if (!h.future.length) return h;
+			const [next, ...rest] = h.future;
+			return {
+				past: [...h.past, h.present],
+				present: next,
+				future: rest,
+				lastKey: null,
+				lastTime: 0,
+			};
+		}
+		case "DO": {
+			const next = cvReducer(h.present, a.action);
+			if (next === h.present) return h;
+			const key = coalesceKey(a.action);
+			const merge =
+				key !== null && key === h.lastKey && a.time - h.lastTime < COALESCE_MS;
+			return {
+				past: merge ? h.past : [...h.past, h.present].slice(-HISTORY_LIMIT),
+				present: next,
+				future: [],
+				lastKey: key,
+				lastTime: a.time,
+			};
+		}
+	}
+}
 
-// Provider
+// ---------------- Context ----------------
+
+interface CVContextValue {
+	state: CVData;
+	dispatch: (action: Action) => void;
+	undo: () => void;
+	redo: () => void;
+	canUndo: boolean;
+	canRedo: boolean;
+	/** False until the saved CV (if any) has been read from localStorage. */
+	hydrated: boolean;
+	saveStatus: "idle" | "saving" | "saved" | "error";
+}
+
+const CVContext = createContext<CVContextValue | undefined>(undefined);
+
 export const CVProvider = ({ children }: { children: ReactNode }) => {
-	const { lang } = useLang();
-	const initialState = getInitialState(lang);
-	const [state, dispatch] = useReducer(cvReducer, initialState);
+	const [history, send] = useReducer(historyReducer, undefined, () => ({
+		past: [],
+		present: sampleCV(),
+		future: [],
+		lastKey: null,
+		lastTime: 0,
+	}));
+	const [hydrated, setHydrated] = useState(false);
+	const [saveStatus, setSaveStatus] =
+		useState<CVContextValue["saveStatus"]>("idle");
+	const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	return (
-		<CVContext.Provider value={{ state, dispatch }}>
-			{children}
-		</CVContext.Provider>
+	// Restore the last session.
+	useEffect(() => {
+		try {
+			const raw = localStorage.getItem(STORAGE_KEY);
+			const saved = raw ? normalizeCV(JSON.parse(raw)) : null;
+			if (saved) send({ type: "HYDRATE", cv: saved });
+		} catch {
+			// Corrupt or blocked storage: keep the sample CV.
+		}
+		setHydrated(true);
+	}, []);
+
+	// Autosave, debounced. A pending save is flushed if the tab is closed or hidden.
+	useEffect(() => {
+		if (!hydrated) return;
+		const save = () => {
+			if (saveTimer.current) clearTimeout(saveTimer.current);
+			saveTimer.current = null;
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(history.present));
+				setSaveStatus("saved");
+			} catch {
+				// Usually the storage quota, from a large portrait image.
+				setSaveStatus("error");
+			}
+		};
+		setSaveStatus("saving");
+		if (saveTimer.current) clearTimeout(saveTimer.current);
+		saveTimer.current = setTimeout(save, 500);
+		const flush = () => saveTimer.current && save();
+		window.addEventListener("pagehide", flush);
+		return () => {
+			window.removeEventListener("pagehide", flush);
+			if (saveTimer.current) clearTimeout(saveTimer.current);
+		};
+	}, [history.present, hydrated]);
+
+	const dispatch = useCallback(
+		(action: Action) => send({ type: "DO", action, time: Date.now() }),
+		[],
 	);
+	const undo = useCallback(() => send({ type: "UNDO" }), []);
+	const redo = useCallback(() => send({ type: "REDO" }), []);
+
+	// Ctrl/Cmd+Z, Ctrl+Y and Ctrl/Cmd+Shift+Z drive the CV history everywhere,
+	// including inside text fields, so undo behaves the same wherever focus is.
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+			const k = e.key.toLowerCase();
+			if (k === "z" && !e.shiftKey) {
+				e.preventDefault();
+				undo();
+			} else if (k === "y" || (k === "z" && e.shiftKey)) {
+				e.preventDefault();
+				redo();
+			}
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [undo, redo]);
+
+	const value = useMemo<CVContextValue>(
+		() => ({
+			state: history.present,
+			dispatch,
+			undo,
+			redo,
+			canUndo: history.past.length > 0,
+			canRedo: history.future.length > 0,
+			hydrated,
+			saveStatus,
+		}),
+		[history, dispatch, undo, redo, hydrated, saveStatus],
+	);
+
+	return <CVContext.Provider value={value}>{children}</CVContext.Provider>;
 };
 
-// Custom Hook
 export const useCV = () => {
 	const context = useContext(CVContext);
-	if (!context) {
-		throw new Error("useCV must be used within a CVProvider");
-	}
+	if (!context) throw new Error("useCV must be used within a CVProvider");
 	return context;
 };
