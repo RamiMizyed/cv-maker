@@ -1,47 +1,61 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { motion, Variants } from "framer-motion";
-import { Poppins } from "next/font/google";
-import { Eye, Languages, LayoutTemplate, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Eye, Github, Languages, LayoutTemplate, Sparkles } from "lucide-react";
 import { useLang } from "@/lib/lang";
 import translations from "@/lib/translations";
 import { Button } from "@/components/ui/button";
 import CVDocument from "@/components/cv-maker/document/CVDocument";
 import { sampleCV } from "@/lib/cv/defaults";
+import { CVData, TemplateId } from "@/types/cv";
+import { cn } from "@/lib/utils";
 
-const poppins = Poppins({
-	subsets: ["latin"],
-	weight: ["600", "700"],
-	variable: "--font-poppins",
-});
-
-const containerVariants: Variants = {
-	hidden: { opacity: 0 },
-	show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
-};
-
-const itemVariants: Variants = {
-	hidden: { opacity: 0, y: 16 },
-	show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-};
-
-// A4 at 96dpi, scaled down for the hero.
-const SHEET_W = 794;
+const SHEET_W = 794; // A4 at 96dpi
 const SHEET_H = 1123;
-const HERO_SCALE = 0.56;
+
+const variant = (template: TemplateId, accentColor: string): CVData => {
+	const cv = sampleCV();
+	cv.settings.template = template;
+	cv.settings.accentColor = accentColor;
+	return cv;
+};
+
+/** A real CVDocument, scaled down. `--s` is the scale, set per breakpoint by the caller. */
+function Sheet({ cv, className }: { cv: CVData; className?: string }) {
+	return (
+		<div
+			className={cn(
+				"overflow-hidden rounded-md bg-white shadow-[0_30px_80px_-20px_rgb(0_0_0/0.45)] ring-1 ring-black/10",
+				className,
+			)}
+			style={{
+				width: `calc(${SHEET_W}px * var(--s))`,
+				height: `calc(${SHEET_H}px * var(--s))`,
+			}}>
+			<div
+				className="pointer-events-none origin-top-left select-none"
+				style={{ width: SHEET_W, transform: "scale(var(--s))" }}
+				dir="ltr">
+				<CVDocument cv={cv} />
+			</div>
+		</div>
+	);
+}
 
 export default function LandingHero() {
 	const { lang } = useLang();
 	const t = translations[lang];
 	const isRtl = lang === "ar";
 
-	const demo = useMemo(() => {
-		const cv = sampleCV();
-		cv.settings.template = "modern";
-		cv.settings.accentColor = "#e11d48";
-		return cv;
-	}, []);
+	const sheets = useMemo(
+		() => ({
+			classic: variant("classic", "#2563eb"),
+			modern: variant("modern", "#e11d48"),
+			minimal: variant("minimal", "#0f766e"),
+		}),
+		[],
+	);
 
 	const features = [
 		{ icon: Eye, title: t.feature1Title, desc: t.feature1Desc },
@@ -53,65 +67,87 @@ export default function LandingHero() {
 	const start = () =>
 		document.getElementById("cvMaker")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
+	const fadeUp = (delay: number) => ({
+		initial: { opacity: 0, y: 14 },
+		animate: { opacity: 1, y: 0 },
+		transition: { duration: 0.5, ease: "easeOut" as const, delay },
+	});
+
 	return (
-		<div className="pt-20 lg:pt-24" dir={isRtl ? "rtl" : "ltr"}>
-			<div className="container mx-auto px-6 py-16 lg:px-8 lg:py-24">
-				<div className="grid items-center gap-14 lg:grid-cols-2">
-					<motion.div
-						className="flex flex-col items-start"
-						variants={containerVariants}
-						initial="hidden"
-						animate="show">
-						<motion.h1
-							variants={itemVariants}
-							className={`${poppins.className} max-w-2xl bg-gradient-to-br from-zinc-900 via-indigo-800 to-pink-500 bg-clip-text text-4xl font-extrabold uppercase text-transparent drop-shadow-sm sm:text-5xl dark:from-zinc-200 dark:via-zinc-100 dark:to-pink-300`}>
-							{t.landingTitle}
-						</motion.h1>
+		<section className="relative isolate overflow-hidden" dir={isRtl ? "rtl" : "ltr"}>
+			{/* Soft glow and a faint grid behind the headline. */}
+			<div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+				<div className="absolute left-1/2 top-[-18rem] h-[36rem] w-[60rem] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px] dark:bg-primary/25" />
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(127_127_127/0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgb(127_127_127/0.08)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" />
+			</div>
 
-						<motion.p variants={itemVariants} className="mt-6 max-w-xl text-lg text-muted-foreground">
-							{t.landingSubtitle}
-						</motion.p>
+			<div className="mx-auto max-w-6xl px-6 pt-32 sm:pt-40">
+				<div className="mx-auto max-w-3xl text-center">
+					<motion.p
+						{...fadeUp(0)}
+						className="mx-auto inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
+						<span className="size-1.5 rounded-full bg-emerald-500" />
+						{t.landingBadge}
+					</motion.p>
 
-						<motion.ul variants={containerVariants} className="mt-8 grid gap-4 sm:grid-cols-2">
-							{features.map(({ icon: Icon, title, desc }) => (
-								<motion.li key={title} variants={itemVariants} className="flex gap-3">
-									<span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-										<Icon className="size-4.5" />
-									</span>
-									<span>
-										<span className="block text-sm font-semibold">{title}</span>
-										<span className="block text-sm text-muted-foreground">{desc}</span>
-									</span>
-								</motion.li>
-							))}
-						</motion.ul>
+					<motion.h1
+						{...fadeUp(0.05)}
+						className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-7xl">
+						{t.landingTitleA}{" "}
+						<span className="text-primary">{t.landingTitleB}</span>
+					</motion.h1>
 
-						<motion.div variants={itemVariants}>
-							<Button className="mt-8" size="lg" onClick={start}>
-								{t.landingCta}
-							</Button>
-						</motion.div>
-					</motion.div>
+					<motion.p
+						{...fadeUp(0.1)}
+						className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
+						{t.landingSubtitle}
+					</motion.p>
 
 					<motion.div
-						className="hidden justify-center sm:flex"
-						initial={{ opacity: 0, y: 24 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-						aria-hidden>
-						<div
-							className="relative overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-black/5 lg:rotate-1"
-							style={{ width: SHEET_W * HERO_SCALE, height: SHEET_H * HERO_SCALE }}>
-							<div
-								className="pointer-events-none origin-top-left select-none"
-								style={{ width: SHEET_W, transform: `scale(${HERO_SCALE})` }}
-								dir="ltr">
-								<CVDocument cv={demo} />
-							</div>
-						</div>
+						{...fadeUp(0.15)}
+						className="mt-9 flex flex-wrap items-center justify-center gap-3">
+						<Button size="lg" onClick={start} className="h-11 px-6 text-base">
+							{t.landingCta}
+							<ArrowRight className="rtl:rotate-180" />
+						</Button>
+						<Button asChild size="lg" variant="outline" className="h-11 px-6 text-base">
+							<a href="https://github.com/RamiMizyed/cv-maker" target="_blank" rel="noopener noreferrer">
+								<Github /> {t.landingGithub}
+							</a>
+						</Button>
 					</motion.div>
 				</div>
+
+				{/* Template fan: three real documents, cropped and faded at the bottom. */}
+				<motion.div
+					initial={{ opacity: 0, y: 40 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.8, ease: "easeOut", delay: 0.25 }}
+					aria-hidden
+					dir="ltr"
+					className="relative mx-auto mt-16 h-[300px] overflow-hidden [--s:0.38] sm:mt-20 sm:h-[440px] sm:[--s:0.5] lg:h-[500px] lg:[--s:0.56]">
+					<div className="absolute left-1/2 top-10 hidden -translate-x-[112%] -rotate-6 opacity-90 sm:block">
+						<Sheet cv={sheets.classic} />
+					</div>
+					<div className="absolute left-1/2 top-10 hidden translate-x-[12%] rotate-6 opacity-90 sm:block">
+						<Sheet cv={sheets.minimal} />
+					</div>
+					<div className="absolute left-1/2 top-0 -translate-x-1/2">
+						<Sheet cv={sheets.modern} />
+					</div>
+					<div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-background" />
+				</motion.div>
+
+				<div className="relative grid gap-8 border-t py-14 sm:grid-cols-2 lg:grid-cols-4">
+					{features.map(({ icon: Icon, title, desc }) => (
+						<div key={title}>
+							<Icon className="size-5 text-primary" />
+							<h3 className="mt-3 font-semibold">{title}</h3>
+							<p className="mt-1 text-sm leading-relaxed text-muted-foreground">{desc}</p>
+						</div>
+					))}
+				</div>
 			</div>
-		</div>
+		</section>
 	);
 }

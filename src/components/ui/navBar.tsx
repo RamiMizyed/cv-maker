@@ -104,14 +104,16 @@ const NavBar = () => {
 				{/* Centered GitHub star button */}
 				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:block">
 					<Button
-						className="flex items-center gap-2"
+						variant="outline"
+						size="sm"
+						className="flex items-center gap-2 rounded-full bg-background/50 backdrop-blur"
 						onClick={() => window.open(`https://github.com/${repo}`, "_blank")}
 						disabled={starsLoading}
 						title={`Star ${repo} on GitHub`}>
 						<GitBranch />
 						<span>Star repo</span>
-						<div className="w-[1px] h-full bg-white"></div>
-						<Star className=" h-4 w-4" />
+						<div className="h-4 w-px bg-border"></div>
+						<Star className="h-4 w-4 text-amber-500" />
 						<span className=" text-sm ">
 							{starCount !== null
 								? new Intl.NumberFormat().format(starCount)
