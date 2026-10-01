@@ -347,6 +347,7 @@ export default function CVDocument({ cv }: { cv: CVData }) {
 		"--cv-fs": `${settings.fontSize}pt`,
 		"--cv-gap": SPACING[settings.spacing],
 		"--cv-page-w": PAGE_SIZE[settings.pageFormat].width,
+		"--cv-page-h": PAGE_SIZE[settings.pageFormat].height,
 		fontFamily: `"${settings.font}", ${rtl ? '"Amiri", ' : ""}system-ui, sans-serif`,
 	} as React.CSSProperties;
 
@@ -381,6 +382,7 @@ export function LetterDocument({ cv, body }: { cv: CVData; body: string }) {
 		"--cv-fs": `${Math.max(settings.fontSize, 10.5)}pt`,
 		"--cv-gap": 1,
 		"--cv-page-w": PAGE_SIZE[settings.pageFormat].width,
+		"--cv-page-h": PAGE_SIZE[settings.pageFormat].height,
 		fontFamily: `"${settings.font}", ${rtl ? '"Amiri", ' : ""}system-ui, sans-serif`,
 	} as React.CSSProperties;
 

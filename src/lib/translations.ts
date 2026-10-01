@@ -1,8 +1,11 @@
 const en = {
 	// Landing page
-	landingTitle: "Craft Your Professional CV in Minutes",
+	landingBadge: "Free and open source. No sign-up.",
+	landingTitleA: "Build a CV",
+	landingTitleB: "that gets read.",
+	landingGithub: "View on GitHub",
 	landingSubtitle:
-		"Build, tailor and export a job-ready CV with a live editor, four templates and an AI assistant. No sign-up, and your data stays in your browser.",
+		"Write it with a live preview, pick a template, tailor it to the job with AI, and download a clean PDF. Your data stays in your browser.",
 	landingCta: "Start building",
 	feature1Title: "Live preview",
 	feature1Desc: "Every change shows on the page as you type.",
@@ -187,7 +190,10 @@ const en = {
 export type Translation = typeof en;
 
 const tr: Translation = {
-	landingTitle: "Profesyonel CV'nizi Dakikalar İçinde Oluşturun",
+	landingBadge: "Ücretsiz ve açık kaynak. Kayıt gerekmez.",
+	landingTitleA: "Okunan bir CV",
+	landingTitleB: "hazırlayın.",
+	landingGithub: "GitHub'da incele",
 	landingSubtitle:
 		"Canlı düzenleyici, dört şablon ve yapay zeka asistanıyla işe hazır bir CV oluşturun, uyarlayın ve dışa aktarın. Kayıt yok, verileriniz tarayıcınızda kalır.",
 	landingCta: "Oluşturmaya başla",
@@ -366,7 +372,10 @@ const tr: Translation = {
 };
 
 const ar: Translation = {
-	landingTitle: "صمّم سيرتك الذاتية الاحترافية في دقائق",
+	landingBadge: "مجاني ومفتوح المصدر. بلا تسجيل.",
+	landingTitleA: "اصنع سيرة ذاتية",
+	landingTitleB: "تُقرأ فعلًا.",
+	landingGithub: "عرض على GitHub",
 	landingSubtitle:
 		"أنشئ سيرة ذاتية جاهزة للعمل وخصّصها وصدّرها باستخدام محرر مباشر وأربعة قوالب ومساعد ذكاء اصطناعي. بلا تسجيل، وبياناتك تبقى في متصفحك.",
 	landingCta: "ابدأ الآن",

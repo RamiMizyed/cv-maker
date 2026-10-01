@@ -16,7 +16,9 @@
 	--cv-pad-y: 14mm;
 
 	width: var(--cv-page-w);
-	min-height: 100%;
+	/* On screen the sheet is at least one full page, so the Modern sidebar runs to the bottom.
+	   In print the page box handles this and a forced height could add a blank page. */
+	min-height: var(--cv-page-h);
 	background: #fff;
 	color: var(--cv-ink);
 	font-size: var(--cv-fs);
@@ -428,7 +430,7 @@
 .cv-columns {
 	display: grid;
 	grid-template-columns: var(--cv-side-w) 1fr;
-	min-height: inherit;
+	min-height: var(--cv-page-h);
 	position: relative;
 }
 
@@ -525,6 +527,10 @@
 /* ---------- print ---------- */
 
 @media print {
+	.cv {
+		min-height: 0;
+	}
+
 	/* The sidebar colour is drawn by a fixed element, which the browser repeats on
 	   every page, so the stripe runs the full height of page 2 and beyond. */
 	.cv-tpl-modern .cv-side-bg {
@@ -540,6 +546,10 @@
 
 	.cv-tpl-modern .cv-side {
 		background: transparent;
+	}
+
+	.cv-columns {
+		min-height: 0;
 	}
 
 	.cv a {
